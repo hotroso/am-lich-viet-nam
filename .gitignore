@@ -9,3 +9,8 @@ build/
 .cxx
 local.properties
 referer_source/
+
+# Keystore (NEVER commit)
+*.jks
+*.keystore
+keystore-base64.txt
