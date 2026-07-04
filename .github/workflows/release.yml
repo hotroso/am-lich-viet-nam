@@ -1,0 +1,83 @@
+name: Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Build Release APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Decode Keystore
+        if: ${{ env.KEY_JKS != '' }}
+        env:
+          KEY_JKS: ${{ secrets.KEY_JKS }}
+        run: echo "$KEY_JKS" | base64 -d > app/keystore.jks
+
+      - name: Build Release APK
+        env:
+          ALIAS: ${{ secrets.ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+        run: |
+          if [ -f app/keystore.jks ]; then
+            ./gradlew assembleRelease \
+              -Pandroid.injected.signing.store.file=$(pwd)/app/keystore.jks \
+              -Pandroid.injected.signing.store.password="$STORE_PASSWORD" \
+              -Pandroid.injected.signing.key.alias="$ALIAS" \
+              -Pandroid.injected.signing.key.password="$KEY_PASSWORD"
+          else
+            ./gradlew assembleRelease
+          fi
+
+      - name: Rename APK
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          cp app/build/outputs/apk/release/app-release.apk "am-lich-viet-nam-${VERSION}.apk" 2>/dev/null || \
+          cp app/build/outputs/apk/release/app-release-unsigned.apk "am-lich-viet-nam-${VERSION}-unsigned.apk"
+
+      - name: Generate QR Code for release
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          RELEASE_URL="https://github.com/${{ github.repository }}/releases/download/${VERSION}/am-lich-viet-nam-${VERSION}.apk"
+          echo "RELEASE_URL=${RELEASE_URL}" >> $GITHUB_ENV
+          echo "QR_URL=https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${RELEASE_URL}" >> $GITHUB_ENV
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body: |
+            ## 📱 Âm Lịch Việt Nam ${{ github.ref_name }}
+
+            ### Download
+            Tải APK bên dưới và cài đặt trên thiết bị Android.
+
+            ### 📷 QR Code
+            Quét mã QR để tải trực tiếp:
+
+            ![QR Code](${{ env.QR_URL }})
+
+          files: |
+            *.apk
