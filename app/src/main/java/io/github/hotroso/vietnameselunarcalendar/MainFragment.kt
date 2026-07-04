@@ -360,6 +360,7 @@ class MainFragment : Fragment() {
     private fun updateZodiacImage(lunarYear: Int) {
         val index = (lunarYear + 8) % 12
         imgConGiap.setImageResource(zodiacDrawables[index])
+        imgConGiap.alpha = 0.3f
     }
 
     private fun isSpecialDay(lunarMonth: Int, lunarDay: Int): Boolean {
