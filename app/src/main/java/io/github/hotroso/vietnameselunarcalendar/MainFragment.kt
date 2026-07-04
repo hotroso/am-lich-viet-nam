@@ -1,7 +1,9 @@
 package io.github.hotroso.vietnameselunarcalendar
 
 import android.os.Bundle
+import android.view.GestureDetector
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
@@ -145,6 +147,42 @@ class MainFragment : Fragment() {
                     updateMonthNavLabel(month - 1, year)
                 }
             }
+        }
+
+        // Swipe gesture: vuốt trái/phải để chuyển tháng
+        val gestureDetector = GestureDetector(requireContext(),
+            object : GestureDetector.SimpleOnGestureListener() {
+                private val SWIPE_THRESHOLD = 100
+                private val SWIPE_VELOCITY_THRESHOLD = 100
+
+                override fun onFling(
+                    e1: MotionEvent?,
+                    e2: MotionEvent,
+                    velocityX: Float,
+                    velocityY: Float
+                ): Boolean {
+                    val diffX = (e2.x) - (e1?.x ?: 0f)
+                    val diffY = (e2.y) - (e1?.y ?: 0f)
+                    if (Math.abs(diffX) > Math.abs(diffY) &&
+                        Math.abs(diffX) > SWIPE_THRESHOLD &&
+                        Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD
+                    ) {
+                        if (diffX > 0) {
+                            // Swipe right → previous month
+                            navigateMonth(-1)
+                        } else {
+                            // Swipe left → next month
+                            navigateMonth(1)
+                        }
+                        return true
+                    }
+                    return false
+                }
+            })
+
+        calendarView.setOnTouchListener { v, event ->
+            gestureDetector.onTouchEvent(event)
+            false // Return false so clicks still work
         }
     }
 

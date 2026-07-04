@@ -8,7 +8,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
+import io.github.hotroso.vietnameselunarcalendar.calendar.CalendarSyncActivity
 import io.github.hotroso.vietnameselunarcalendar.reminder.EventListActivity
+import io.github.hotroso.vietnameselunarcalendar.upcoming.UpcomingEventsActivity
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,6 +28,16 @@ class MainActivity : AppCompatActivity() {
         headerView.findViewById<TextView>(R.id.tvEvents)?.setOnClickListener {
             drawerLayout.close()
             startActivity(Intent(this, EventListActivity::class.java))
+        }
+
+        headerView.findViewById<TextView>(R.id.tvUpcoming)?.setOnClickListener {
+            drawerLayout.close()
+            startActivity(Intent(this, UpcomingEventsActivity::class.java))
+        }
+
+        headerView.findViewById<TextView>(R.id.tvCalendarSync)?.setOnClickListener {
+            drawerLayout.close()
+            startActivity(Intent(this, CalendarSyncActivity::class.java))
         }
 
         headerView.findViewById<TextView>(R.id.tvConvert)?.setOnClickListener {

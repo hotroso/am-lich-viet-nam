@@ -43,6 +43,42 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"/>
 
+        <!-- MỞ RỘNG: Sắp tới (countdown) -->
+        <TextView
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
+            android:gravity="center_vertical"
+            android:id="@+id/tvUpcoming"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="  📈 Sắp tới"
+            android:textAllCaps="false"/>
+
+        <View
+            android:background="@android:color/darker_gray"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
+
+        <!-- MỞ RỘNG: Đồng bộ Google Calendar -->
+        <TextView
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
+            android:gravity="center_vertical"
+            android:id="@+id/tvCalendarSync"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="  🗓️ Đồng bộ Calendar"
+            android:textAllCaps="false"/>
+
+        <View
+            android:background="@android:color/darker_gray"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
+
         <!-- GỐC: Chuyển đổi ngày -->
         <TextView
             android:textAppearance="@style/TextAppearance.MaterialComponents.Button"

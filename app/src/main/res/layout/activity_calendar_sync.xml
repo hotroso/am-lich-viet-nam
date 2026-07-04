@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/calendar_header_background"
+        app:title="Đồng bộ Google Calendar"
+        app:navigationIcon="@drawable/ic_arrow_back_black_24"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Info section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="📅 Đồng bộ sự kiện âm lịch"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Xuất các sự kiện (ngày giỗ, sinh nhật, ngày lễ) sang Google Calendar hoặc ứng dụng lịch trên máy."
+                android:textSize="15sp"
+                android:lineSpacingMultiplier="1.3"/>
+
+            <!-- Features list -->
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:padding="12dp"
+                android:background="@drawable/rounded_background">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="✓ Tự động chuyển ngày âm → dương cho 3 năm tới"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="6dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="✓ Thêm thông tin Can Chi, tiết khí vào mô tả"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="6dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="✓ Tự động set nhắc nhở theo cài đặt"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="6dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="✓ Hiển thị kỷ niệm (xx năm ngày mất / xx tuổi)"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <!-- Sync button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSyncAll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="🔄 Đồng bộ tất cả sự kiện"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                app:cornerRadius="8dp"/>
+
+            <!-- Note -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Lưu ý: Do ngày âm lịch thay đổi hàng năm, bạn nên đồng bộ lại mỗi đầu năm mới để cập nhật ngày dương chính xác."
+                android:textSize="13sp"
+                android:textColor="@android:color/darker_gray"
+                android:fontFamily="sans-serif"
+                android:lineSpacingMultiplier="1.3"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
