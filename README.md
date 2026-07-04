@@ -33,6 +33,8 @@
 - 🧭 **Hướng xuất hành** — Tài thần, Hỷ thần, Hạc thần
 - 🔄 **Chuyển đổi ngày** — Dương lịch ⇄ Âm lịch
 - 📌 **Sự kiện âm lịch** — Lên lịch ngày giỗ, sinh nhật âm lịch với nhắc nhở tự động
+- 🎂 **Kỷ niệm thông minh** — Tự động tính và hiển thị "kỷ niệm xx năm" / "tròn xx tuổi"
+- 🌙 **Tự nhận diện tháng nhuận** — Nhập năm, app tự xác định tháng nhuận chính xác
 - 📱 **Widget** — 3 loại widget hiển thị trên màn hình chính
 - 📤 **Chia sẻ** — Chia sẻ thông tin ngày qua tin nhắn, mạng xã hội
 
