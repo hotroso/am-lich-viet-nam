@@ -27,6 +27,7 @@
 - 📅 **Xem ngày Âm/Dương** — Hiển thị chính xác ngày lịch âm và dương
 - 🐉 **Can Chi** — Tra cứu Can Chi năm, tháng, ngày, giờ
 - ⏰ **Giờ Hoàng Đạo** — Thông tin khung giờ tốt trong ngày
+- 🌟 **Ngày tốt/xấu** — Đánh giá ngày dựa trên Trực + Hoàng Đạo, gợi ý "Nên làm" / "Không nên"
 - 🌿 **Tiết Khí** — Theo dõi 24 tiết khí trong năm
 - 📖 **Nhị Thập Bát Tú** — Chi tiết 28 ngôi sao theo ngày
 - 🧭 **Hướng xuất hành** — Tài thần, Hỷ thần, Hạc thần

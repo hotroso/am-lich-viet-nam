@@ -42,11 +42,13 @@ class MainFragment : Fragment() {
     private lateinit var tvTietKhi: TextView
     private lateinit var tvEvent: TextView
     private lateinit var tvGioHoangDao: TextView
+    private lateinit var tvDayRating: TextView
     private lateinit var calendarView: CalendarView2
     private lateinit var imgTetBg: ImageView
     private lateinit var imgConGiap: ImageView
     private lateinit var btnSetting: ImageButton
     private lateinit var btnChooseDate: ImageButton
+    private lateinit var btnDayInfo: ImageButton
 
     // Month navigation
     private lateinit var btnPrevMonth: ImageButton
@@ -121,10 +123,12 @@ class MainFragment : Fragment() {
         tvTietKhi = view.findViewById(R.id.tvTietkhi)
         tvEvent = view.findViewById(R.id.main_event)
         tvGioHoangDao = view.findViewById(R.id.tvGioHoangDao)
+        tvDayRating = view.findViewById(R.id.tvDayRating)
         imgTetBg = view.findViewById(R.id.imageViewTetBackground)
         imgConGiap = view.findViewById(R.id.imgCongiap)
         btnSetting = view.findViewById(R.id.btnSetting)
         btnChooseDate = view.findViewById(R.id.btnChooseDate2)
+        btnDayInfo = view.findViewById(R.id.btnDayInfo)
     }
 
     private fun setupCalendar(view: View) {
@@ -150,6 +154,9 @@ class MainFragment : Fragment() {
         }
         btnChooseDate.setOnClickListener {
             showDatePickerBottomSheet()
+        }
+        btnDayInfo.setOnClickListener {
+            showDateDetail()
         }
     }
 
@@ -334,6 +341,11 @@ class MainFragment : Fragment() {
             tvTietKhi.text = getString(R.string.tiet) + " " + info.tietKhi
             tvGioHoangDao.text = "Giờ Hoàng Đạo: " + info.gioHoangDao
         }
+
+        // Observe lunarDate để update "Ngày tốt/xấu" section
+        viewModel.lunarDate.observe(viewLifecycleOwner) { lunar ->
+            updateDayAdvice(lunar.julianDay)
+        }
     }
 
     /**
@@ -350,5 +362,39 @@ class MainFragment : Fragment() {
     private fun isSpecialDay(lunarMonth: Int, lunarDay: Int): Boolean {
         // Mùng 1, 15 hàng tháng; Tết; Giỗ tổ Hùng Vương...
         return lunarDay == 1 || lunarDay == 15
+    }
+
+    /**
+     * Cập nhật section "Ngày tốt/xấu cho công việc" dựa trên Julian Day.
+     * Hiển thị badge ngắn gọn, bấm vào mở chi tiết.
+     */
+    private fun updateDayAdvice(jdn: Int) {
+        if (jdn == 0) return
+
+        val advice = CanChi.getDayAdvice(jdn)
+
+        // Rating label + color
+        val ratingColor = when (advice.rating) {
+            CanChi.DayRating.VERY_GOOD -> android.graphics.Color.parseColor("#1B5E20")
+            CanChi.DayRating.GOOD -> android.graphics.Color.parseColor("#2E7D32")
+            CanChi.DayRating.NORMAL -> android.graphics.Color.parseColor("#F57F17")
+            CanChi.DayRating.BAD -> android.graphics.Color.parseColor("#E65100")
+            CanChi.DayRating.VERY_BAD -> android.graphics.Color.parseColor("#B71C1C")
+        }
+
+        val ratingEmoji = when (advice.rating) {
+            CanChi.DayRating.VERY_GOOD -> "🌟"
+            CanChi.DayRating.GOOD -> "👍"
+            CanChi.DayRating.NORMAL -> "➖"
+            CanChi.DayRating.BAD -> "⚠️"
+            CanChi.DayRating.VERY_BAD -> "❌"
+        }
+
+        tvDayRating.text = "$ratingEmoji ${advice.ratingLabel} — Trực ${advice.truc}  ▸ Xem chi tiết"
+        tvDayRating.setTextColor(ratingColor)
+
+        tvDayRating.setOnClickListener {
+            showDateDetail()
+        }
     }
 }

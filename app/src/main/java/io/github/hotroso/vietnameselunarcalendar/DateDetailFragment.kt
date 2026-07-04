@@ -139,6 +139,24 @@ class DateDetailFragment : BottomSheetDialogFragment() {
         val truc = "<b>Trực:</b> ${CanChi.getTruc(jdn)}"
         val trucDetail = "<i>${CanChi.getTrucDetail(jdn)}</i>"
 
+        // Ngày tốt/xấu cho công việc
+        val dayAdvice = CanChi.getDayAdvice(jdn)
+        val ratingColor = when (dayAdvice.rating) {
+            CanChi.DayRating.VERY_GOOD -> "#1B5E20"
+            CanChi.DayRating.GOOD -> "#2E7D32"
+            CanChi.DayRating.NORMAL -> "#F57F17"
+            CanChi.DayRating.BAD -> "#E65100"
+            CanChi.DayRating.VERY_BAD -> "#B71C1C"
+        }
+        val dayAdviceHtml = buildString {
+            append("<div style='margin-top:10px;padding:8px;border-radius:6px;background:#f5f5f5;'>")
+            append("<b style='color:$ratingColor;'>${dayAdvice.ratingLabel}</b>")
+            append(" — Trực ${dayAdvice.truc} (${dayAdvice.hoangDaoLabel})")
+            append("<br/><span style='color:#2E7D32;'>✓ Nên:</span> ${dayAdvice.nenLam.joinToString(", ")}")
+            append("<br/><span style='color:#B71C1C;'>✗ Kiêng:</span> ${dayAdvice.khongNen.joinToString(", ")}")
+            append("</div>")
+        }
+
         // Tuổi xung khắc
         val tuoiXungKhac = CanChi.getTuoiXungKhac(jdn)
 
@@ -161,6 +179,7 @@ class DateDetailFragment : BottomSheetDialogFragment() {
         template = template.replace("[tvTietkhi]", tietKhi)
         template = template.replace("[tvTruc]", truc)
         template = template.replace("[tvTrucDetail]", trucDetail)
+        template = template.replace("[tvDayAdvice]", dayAdviceHtml)
         template = template.replace("[tvTuoixungkhac]", tuoiXungKhac)
         template = template.replace("[tvTaithan]", taiThan)
         template = template.replace("[tvHythan]", hyThan)

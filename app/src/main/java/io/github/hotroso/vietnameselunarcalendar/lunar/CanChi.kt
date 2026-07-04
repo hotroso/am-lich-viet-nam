@@ -255,6 +255,133 @@ object CanChi {
         return if (month in 1..12) THANG_AM[month - 1] else ""
     }
 
+    // ============================================================
+    // NGÀY TỐT / XẤU CHO CÔNG VIỆC (dựa trên Trực + Hoàng Đạo)
+    // ============================================================
+
+    /**
+     * Mapping từ 12 Trực → danh sách "Nên làm" và "Không nên làm"
+     * Dựa trên Bách Gia Lịch và Ngọc Hạp thông thư
+     */
+    val TRUC_NEN_LAM = arrayOf(
+        // 0 - Kiến
+        arrayOf("Xuất hành", "Khởi công", "Khai trương", "Động thổ", "Nhậm chức", "Giao dịch"),
+        // 1 - Trừ
+        arrayOf("Chữa bệnh", "Dọn dẹp", "Tẩy trần", "Cúng tế", "Giải trừ xui xẻo", "Phá dỡ"),
+        // 2 - Mãn
+        arrayOf("Cầu tài", "Cưới hỏi", "Khai trương", "Nhập trạch", "Thu tiền", "Ký hợp đồng"),
+        // 3 - Bình
+        arrayOf("Giao dịch", "Đi xa", "Ký kết", "Mở cửa hàng", "Mua bán", "Sửa chữa nhỏ"),
+        // 4 - Định
+        arrayOf("Cưới hỏi", "Ăn hỏi", "Hợp tác", "Giao kết", "Nhập học", "Cầu phúc"),
+        // 5 - Chấp
+        arrayOf("Xây dựng", "Sửa chữa", "Trồng cây", "Chăn nuôi", "Thu hoạch", "Mua tài sản"),
+        // 6 - Phá
+        arrayOf("Phá dỡ", "Tháo dỡ", "Điều trị bệnh"),
+        // 7 - Nguy
+        arrayOf("Cúng bái", "Cầu an", "Bốc thuốc"),
+        // 8 - Thành
+        arrayOf("Khai trương", "Cưới hỏi", "Nhập trạch", "Xuất hành", "Khởi công", "Ký hợp đồng", "Giao dịch lớn"),
+        // 9 - Thu
+        arrayOf("Thu nợ", "Gặt hái", "Kết thúc việc", "Thu tiền", "Cất tiền"),
+        // 10 - Khai
+        arrayOf("Khai trương", "Nhập học", "Khởi sự", "Khai bút", "Xuất hành", "Cưới hỏi", "Dọn nhà"),
+        // 11 - Bế
+        arrayOf("Nghỉ ngơi", "Cất của", "Trị bệnh mãn tính")
+    )
+
+    val TRUC_KHONG_NEN = arrayOf(
+        // 0 - Kiến
+        arrayOf("Kiện cáo", "Mổ xẻ"),
+        // 1 - Trừ
+        arrayOf("Cưới hỏi", "Khai trương", "Khởi công"),
+        // 2 - Mãn
+        arrayOf("Kiện cáo", "Động thổ", "Gieo trồng"),
+        // 3 - Bình
+        arrayOf("Cầu phúc lớn", "Kiện tụng"),
+        // 4 - Định
+        arrayOf("Kiện cáo", "Tranh chấp", "Xuất hành xa"),
+        // 5 - Chấp
+        arrayOf("Xuất hành xa", "Dọn nhà", "Mở cửa hàng"),
+        // 6 - Phá
+        arrayOf("Cưới hỏi", "Khai trương", "Ký hợp đồng", "Khởi công", "Nhập trạch", "Xuất hành"),
+        // 7 - Nguy
+        arrayOf("Khởi công", "Leo trèo", "Xuất hành xa", "Giao dịch lớn", "Nhập trạch", "Mạo hiểm"),
+        // 8 - Thành
+        arrayOf("Kiện cáo", "Phá dỡ"),
+        // 9 - Thu
+        arrayOf("Khởi công", "Khai trương", "Xuất hành"),
+        // 10 - Khai
+        arrayOf("Chôn cất", "Phá dỡ"),
+        // 11 - Bế
+        arrayOf("Khai trương", "Xuất hành", "Cưới hỏi", "Động thổ", "Khởi công", "Ký kết")
+    )
+
+    /**
+     * Đánh giá tổng quan ngày: Tốt / Bình thường / Xấu
+     * Dựa trên: Trực + Hoàng Đạo/Hắc Đạo
+     */
+    enum class DayRating {
+        VERY_GOOD,  // Hoàng đạo + Trực tốt
+        GOOD,       // Hoàng đạo hoặc Trực tốt
+        NORMAL,     // Bình thường
+        BAD,        // Trực xấu + Hắc đạo
+        VERY_BAD    // Phá/Bế + Hắc đạo
+    }
+
+    data class DayAdvice(
+        val rating: DayRating,
+        val ratingLabel: String,
+        val truc: String,
+        val trucIndex: Int,
+        val isHoangDao: Boolean,
+        val hoangDaoLabel: String,
+        val nenLam: List<String>,
+        val khongNen: List<String>
+    )
+
+    /**
+     * Tính lời khuyên ngày tốt/xấu cho một ngày cụ thể.
+     */
+    fun getDayAdvice(jdn: Int): DayAdvice {
+        val trucIndex = (jdn + 1) % 12
+        val truc = TRUC[trucIndex]
+        val (isHoangDao, hoangDaoLabel) = getHoangDaoHacDao(jdn)
+
+        // Trực tốt: Kiến(0), Mãn(2), Định(4), Thành(8), Khai(10)
+        // Trực xấu: Phá(6), Nguy(7), Bế(11)
+        // Trực trung bình: Trừ(1), Bình(3), Chấp(5), Thu(9)
+        val trucTot = trucIndex in intArrayOf(0, 2, 4, 8, 10)
+        val trucXau = trucIndex in intArrayOf(6, 7, 11)
+
+        val rating = when {
+            trucTot && isHoangDao -> DayRating.VERY_GOOD
+            trucTot || isHoangDao -> DayRating.GOOD
+            trucXau && !isHoangDao -> DayRating.VERY_BAD
+            trucXau -> DayRating.BAD
+            else -> DayRating.NORMAL
+        }
+
+        val ratingLabel = when (rating) {
+            DayRating.VERY_GOOD -> "Đại cát"
+            DayRating.GOOD -> "Tốt"
+            DayRating.NORMAL -> "Bình thường"
+            DayRating.BAD -> "Không tốt"
+            DayRating.VERY_BAD -> "Xấu"
+        }
+
+        return DayAdvice(
+            rating = rating,
+            ratingLabel = ratingLabel,
+            truc = truc,
+            trucIndex = trucIndex,
+            isHoangDao = isHoangDao,
+            hoangDaoLabel = hoangDaoLabel,
+            nenLam = TRUC_NEN_LAM[trucIndex].toList(),
+            khongNen = TRUC_KHONG_NEN[trucIndex].toList()
+        )
+    }
+
     /**
      * Chi tiết can chi đầy đủ cho một ngày.
      */

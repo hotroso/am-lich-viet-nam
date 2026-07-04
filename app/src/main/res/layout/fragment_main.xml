@@ -94,14 +94,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:textSize="94sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/black"
-                    android:id="@+id/main_big_day"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/layoutBigDay"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"/>
+                    android:layout_centerHorizontal="true">
+
+                    <TextView
+                        android:textSize="94sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/black"
+                        android:id="@+id/main_big_day"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <ImageButton
+                        android:id="@+id/btnDayInfo"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_gravity="top"
+                        android:layout_marginTop="12dp"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/ic_info_circle"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="Xem chi tiết ngày"/>
+                </LinearLayout>
 
                 <TextView
                     android:textSize="20sp"
@@ -109,7 +129,7 @@
                     android:id="@+id/main_day_of_week"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/main_big_day"
+                    android:layout_below="@+id/layoutBigDay"
                     android:layout_centerHorizontal="true"/>
 
                 <!-- Lunar info section -->
@@ -244,6 +264,19 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_below="@+id/main_event"/>
+
+                <!-- Nút xem chi tiết ngày -->
+                <TextView
+                    android:id="@+id/tvDayRating"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tvGioHoangDao"
+                    android:layout_marginTop="8dp"
+                    android:padding="6dp"
+                    android:background="@drawable/rounded_background"/>
 
             </RelativeLayout>
         </androidx.core.widget.NestedScrollView>
