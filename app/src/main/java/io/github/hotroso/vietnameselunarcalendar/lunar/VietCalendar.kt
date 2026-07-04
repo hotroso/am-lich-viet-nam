@@ -283,6 +283,22 @@ object VietCalendar {
     }
 
     /**
+     * Lấy tháng nhuận của năm âm lịch.
+     * @return số tháng nhuận (1-12) hoặc 0 nếu năm đó không có tháng nhuận.
+     */
+    fun getLeapMonthOfYear(lunarYear: Int): Int {
+        val a11 = getLunarMonth11(lunarYear - 1)
+        val b11 = getLunarMonth11(lunarYear)
+        if (b11 - a11 <= 365) return 0
+
+        val leapOff = getLeapMonthOffset(a11)
+        var leapMonth = leapOff - 2
+        if (leapMonth < 0) leapMonth += 12
+        if (leapMonth == 0) leapMonth = 12
+        return leapMonth
+    }
+
+    /**
      * Check if a solar date is a "good" day (Đại lợi).
      * Simplified check based on lunar day and solar term.
      */

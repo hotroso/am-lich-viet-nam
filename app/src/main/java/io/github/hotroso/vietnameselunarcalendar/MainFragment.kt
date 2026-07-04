@@ -320,7 +320,10 @@ class MainFragment : Fragment() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val db = AppDatabase.getInstance(requireContext())
                 val userEvents = db.lunarEventDao().getEventsByLunarDate(lunar.day, lunar.month)
-                val userEventNames = userEvents.filter { it.isEnabled }.map { "📌 ${it.title}" }
+                val currentLunarYear = lunar.year
+                val userEventNames = userEvents
+                    .filter { it.isEnabled }
+                    .map { "📌 ${it.getDisplayTitle(currentLunarYear)}" }
 
                 withContext(Dispatchers.Main) {
                     val allEvents = events + userEventNames

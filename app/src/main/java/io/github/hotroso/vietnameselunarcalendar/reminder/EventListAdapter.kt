@@ -44,11 +44,20 @@ class EventListAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val event = getItem(position)
-        holder.tvTitle.text = event.title
+
+        // Hiển thị title với kỷ niệm xx năm (nếu có năm gốc)
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        val currentLunar = VietCalendar.solarToLunar(
+            Calendar.getInstance().get(Calendar.DAY_OF_MONTH),
+            Calendar.getInstance().get(Calendar.MONTH) + 1,
+            currentYear
+        )
+        holder.tvTitle.text = event.getDisplayTitle(currentLunar.year)
 
         // Hiển thị ngày âm lịch
         val monthName = CanChi.tenThangAm(event.lunarMonth)
-        holder.tvDate.text = "Ngày ${event.lunarDay} tháng $monthName" +
+        val yearInfo = if (event.lunarYear > 0) " năm ${event.lunarYear}" else ""
+        holder.tvDate.text = "Ngày ${event.lunarDay} tháng $monthName$yearInfo" +
                 if (event.isLeapMonth) " (nhuận)" else ""
 
         // Hiển thị tần suất
@@ -61,7 +70,6 @@ class EventListAdapter(
         }
 
         // Tính và hiển thị ngày dương tương ứng (năm nay)
-        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
         val solar = try {
             VietCalendar.lunarToSolar(
                 event.lunarDay, event.lunarMonth, currentYear,

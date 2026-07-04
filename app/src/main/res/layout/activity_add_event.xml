@@ -23,13 +23,13 @@
                 android:inputType="text"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <View android:layout_width="match_parent" android:layout_height="16dp"/>
+        <View android:layout_width="match_parent" android:layout_height="12dp"/>
 
         <!-- Note -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Ghi chú">
+            android:hint="Ghi chú (không bắt buộc)">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etNote"
                 android:layout_width="match_parent"
@@ -38,7 +38,7 @@
                 android:minLines="2"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <View android:layout_width="match_parent" android:layout_height="24dp"/>
+        <View android:layout_width="match_parent" android:layout_height="20dp"/>
 
         <!-- Lunar date section -->
         <TextView
@@ -49,6 +49,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"/>
 
+        <!-- Row: Ngày / Tháng / Năm -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -58,7 +59,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="6dp"
                 android:hint="Ngày">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etLunarDay"
@@ -71,6 +72,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginEnd="6dp"
                 android:hint="Tháng">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etLunarMonth"
@@ -78,17 +80,92 @@
                     android:layout_height="wrap_content"
                     android:inputType="number"/>
             </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Năm (tùy chọn)">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etLunarYear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"/>
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- Leap month checkbox -->
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/cbLeapMonth"
+        <!-- Leap month: auto-detected info or manual checkbox -->
+        <LinearLayout
+            android:id="@+id/layoutLeapMonth"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp">
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/cbLeapMonth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tháng nhuận"/>
+
+            <TextView
+                android:id="@+id/tvLeapInfo"
+                android:textSize="12sp"
+                android:textColor="@color/vietcal_text_t7_color"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:visibility="gone"/>
+        </LinearLayout>
+
+        <View android:layout_width="match_parent" android:layout_height="20dp"/>
+
+        <!-- Event type (mới thêm) -->
+        <TextView
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:text="Loại sự kiện"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tháng nhuận"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginBottom="8dp"/>
 
-        <View android:layout_width="match_parent" android:layout_height="24dp"/>
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupEventType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="true"
+            app:selectionRequired="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipGio"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ngày giỗ"
+                android:checked="true"/>
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipSinhNhat"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sinh nhật"/>
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipLe"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ngày lễ"/>
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipKhac"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Khác"/>
+        </com.google.android.material.chip.ChipGroup>
+
+        <View android:layout_width="match_parent" android:layout_height="20dp"/>
 
         <!-- Repeat -->
         <TextView
@@ -111,25 +188,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Hàng năm"
-                android:checked="true"
-                app:checkedIconTint="@color/colorSecondary"/>
+                android:checked="true"/>
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipMonthly"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hàng tháng"
-                app:checkedIconTint="@color/colorSecondary"/>
+                android:text="Hàng tháng"/>
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipOnce"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Một lần"
-                app:checkedIconTint="@color/colorSecondary"/>
+                android:text="Một lần"/>
         </com.google.android.material.chip.ChipGroup>
 
-        <View android:layout_width="match_parent" android:layout_height="24dp"/>
+        <View android:layout_width="match_parent" android:layout_height="20dp"/>
 
         <!-- Remind days before -->
         <TextView
@@ -151,33 +225,29 @@
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Đúng ngày"
-                app:checkedIconTint="@color/colorSecondary"/>
+                android:text="Đúng ngày"/>
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip1Day"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Trước 1 ngày"
-                android:checked="true"
-                app:checkedIconTint="@color/colorSecondary"/>
+                android:text="1 ngày"
+                android:checked="true"/>
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip2Days"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Trước 2 ngày"
-                app:checkedIconTint="@color/colorSecondary"/>
+                android:text="2 ngày"/>
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip7Days"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Trước 1 tuần"
-                app:checkedIconTint="@color/colorSecondary"/>
+                android:text="1 tuần"/>
         </com.google.android.material.chip.ChipGroup>
 
-        <View android:layout_width="match_parent" android:layout_height="24dp"/>
+        <View android:layout_width="match_parent" android:layout_height="20dp"/>
 
         <!-- Remind time -->
         <TextView
@@ -197,14 +267,15 @@
             app:strokeColor="@color/colorSecondary"
             android:textColor="@color/colorSecondary"/>
 
-        <View android:layout_width="match_parent" android:layout_height="32dp"/>
+        <View android:layout_width="match_parent" android:layout_height="28dp"/>
 
         <!-- Buttons row -->
         <LinearLayout
             android:orientation="horizontal"
             android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancel"
@@ -223,7 +294,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Lưu và đặt nhắc nhở"
+                android:text="Lưu"
                 android:textAllCaps="false"
                 app:backgroundTint="@color/colorSecondary"
                 android:textColor="@android:color/white"/>
