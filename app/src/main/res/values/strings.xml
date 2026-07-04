@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Âm lịch Việt Nam</string>
-    <string name="app_about">Ứng dụng xem ngày Âm Lịch, chuyển đổi qua lại ngày Dương lịch sang Âm lịch.\n\nMade with ❤ in Hanoi</string>
+    <string name="app_about">Ứng dụng xem ngày Âm Lịch, chuyển đổi qua lại ngày Dương lịch sang Âm lịch.\n\nMade by hotroso with love ❤</string>
     <string name="button_calendar_picker">Button calendar picker</string>
     <string name="day_title">Tháng %1$d năm %2$d</string>
     <string name="thang">Tháng</string>
