@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="border_padding">2dp</dimen>
+    <dimen name="font_big">22sp</dimen>
+    <dimen name="font_normal">16sp</dimen>
+    <dimen name="font_sbig">38sp</dimen>
+    <dimen name="font_small">14sp</dimen>
+    <dimen name="font_smallest">12sp</dimen>
+    <dimen name="font_spinner">16sp</dimen>
+    <dimen name="font_widget_large">20sp</dimen>
+    <dimen name="font_widget_normal">12sp</dimen>
+    <dimen name="font_widget_small">10sp</dimen>
+    <dimen name="font_widget_xlarge">30sp</dimen>
+</resources>

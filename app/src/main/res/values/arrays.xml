@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="day_of_week">
+        <item>Thứ hai</item>
+        <item>Thứ ba</item>
+        <item>Thứ tư</item>
+        <item>Thứ năm</item>
+        <item>Thứ sáu</item>
+        <item>Thứ bảy</item>
+        <item>Chủ nhật</item>
+    </array>
+    <array name="day_of_week_short">
+        <item>Th 2</item>
+        <item>Th 3</item>
+        <item>Th 4</item>
+        <item>Th 5</item>
+        <item>Th 6</item>
+        <item>Th 7</item>
+        <item>CN</item>
+    </array>
+    <array name="truc">
+        <item>Kiến</item>
+        <item>Trừ</item>
+        <item>Mãn</item>
+        <item>Bình</item>
+        <item>Định</item>
+        <item>Chấp</item>
+        <item>Phá</item>
+        <item>Nguy</item>
+        <item>Thành</item>
+        <item>Thu</item>
+        <item>Khai</item>
+        <item>Bế</item>
+    </array>
+    <array name="truc_chitiet">
+        <item>Tốt với xuất hành, giá thú nhưng tránh động thổ</item>
+        <item>Tốt mọi việc</item>
+        <item>Nên cầu tài, cầu phúc, tế tự</item>
+        <item>Tốt mọi việc</item>
+        <item>Tốt về cầu tài, ký hợp đồng, yến tiệc</item>
+        <item>Tốt cho khởi công xây dựng</item>
+        <item>Nên chữa bệnh, phá dỡ nhà</item>
+        <item>Xấu mọi việc</item>
+        <item>Tốt cho xuất hành, khai trương, giá thú</item>
+        <item>Thu hoạch tốt</item>
+        <item>Tốt mọi việc trừ động thổ, an táng</item>
+        <item>Xấu mọi việc trừ đáp đê, lấp hố</item>
+    </array>
+</resources>

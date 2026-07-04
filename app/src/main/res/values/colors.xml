@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Calendar colors -->
+    <color name="calendar_header_background">#ffffce</color>
+    <color name="calendarview2_border_cell_selected">#d4a56f</color>
+    <color name="calendarview2_cell_normal_date">#fdfdf1</color>
+    <color name="calendarview2_cell_selected">#fcfcfc</color>
+
+    <!-- Cell text colors -->
+    <color name="cell_text_color">#000000</color>
+    <color name="cell_text_color_disabled">#acacac</color>
+    <color name="cell_text2_color">#3e42f6</color>
+    <color name="cell_text2_color_disabled">#bcb3ff</color>
+
+    <!-- VietCal specific -->
+    <color name="vietcal_date_selected_color">#e2eefa</color>
+    <color name="vietcal_date_today_color">#ffff00</color>
+    <color name="vietcal_gridview_background">#d3d3c7</color>
+    <color name="vietcal_text_disabled_color">#acacac</color>
+    <color name="vietcal_text_special_date_color">#df2020</color>
+    <color name="vietcal_text_special_date_color_disabled">#d58686</color>
+    <color name="vietcal_text_t7_color">#008000</color>
+    <color name="vietcal_text_t7_color_disabled">#7d8d7d</color>
+
+    <!-- Theme colors -->
+    <color name="colorPrimary">#FFFFCE</color>
+    <color name="colorPrimaryDark">#E6E6B8</color>
+    <color name="colorAccent">#d4a56f</color>
+    <color name="colorOnPrimary">#ffffff</color>
+    <color name="colorSecondary">#b22b23</color>
+    <color name="primaryColor">#a4000a</color>
+    <color name="title_color">#960000</color>
+</resources>

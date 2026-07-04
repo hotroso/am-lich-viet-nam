@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/imageViewTetBackground"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:scaleType="fitStart"
+        android:adjustViewBounds="true"
+        android:alpha="0.5"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:id="@+id/main_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_anchorGravity="fill">
+
+        <!-- Top navigation bar -->
+        <RelativeLayout
+            android:id="@+id/layoutDateNav"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/btnSetting"
+                android:background="@android:color/transparent"
+                android:paddingLeft="10dp"
+                android:paddingTop="7dp"
+                android:paddingRight="5dp"
+                android:paddingBottom="7dp"
+                android:layout_width="42dp"
+                android:layout_height="37dp"
+                android:src="@drawable/ic_hamburger_menu"
+                android:scaleType="fitXY"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:contentDescription="Menu"/>
+
+            <TextView
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:ellipsize="marquee"
+                android:id="@+id/calendarViewTitle"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:layout_centerInParent="true"
+                android:textAlignment="center"
+                android:layout_toStartOf="@+id/btnChooseDate2"
+                android:layout_toEndOf="@+id/btnSetting"/>
+
+            <ImageButton
+                android:id="@+id/btnChooseDate2"
+                android:background="@android:color/transparent"
+                android:paddingLeft="5dp"
+                android:paddingTop="5dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="5dp"
+                android:layout_width="42dp"
+                android:layout_height="37dp"
+                android:src="@drawable/ic_calendar"
+                android:scaleType="fitXY"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:contentDescription="@string/button_calendar_picker"/>
+        </RelativeLayout>
+
+        <!-- Date info section -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/sclTop"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="50dp"
+            android:fillViewport="true">
+
+            <RelativeLayout
+                android:id="@+id/layoutMainDte"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:gravity="center_horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:textSize="94sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/main_big_day"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"/>
+
+                <TextView
+                    android:textSize="20sp"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/main_day_of_week"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/main_big_day"
+                    android:layout_centerHorizontal="true"/>
+
+                <!-- Lunar info section -->
+                <RelativeLayout
+                    android:id="@+id/main_al_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/main_day_of_week">
+
+                    <ImageView
+                        android:id="@+id/imgCongiap"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
+                        android:layout_centerInParent="true"/>
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:id="@+id/main_al"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:baselineAligned="false"
+                        android:layout_alignParentTop="true">
+
+                        <!-- Left: Lunar date -->
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1">
+
+                            <TextView
+                                android:textSize="16sp"
+                                android:textColor="@android:color/black"
+                                android:gravity="center_horizontal"
+                                android:id="@+id/main_al_month"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"/>
+
+                            <TextView
+                                android:textSize="34sp"
+                                android:textStyle="bold"
+                                android:textColor="@android:color/black"
+                                android:gravity="center"
+                                android:id="@+id/main_al_day"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"/>
+
+                            <TextView
+                                android:textSize="16sp"
+                                android:textColor="@android:color/black"
+                                android:gravity="center"
+                                android:id="@+id/main_al_year"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"/>
+
+                            <io.github.hotroso.vietnameselunarcalendar.ui.DigitalClock
+                                android:textSize="14sp"
+                                android:textColor="@android:color/black"
+                                android:gravity="center"
+                                android:id="@+id/digitalClock"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"/>
+                        </LinearLayout>
+
+                        <!-- Right: Can Chi info -->
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+
+                            <TextView
+                                android:textSize="16sp"
+                                android:textColor="@android:color/black"
+                                android:gravity="center_horizontal"
+                                android:id="@+id/main_alc_month"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"/>
+
+                            <TextView
+                                android:textSize="16sp"
+                                android:textColor="@android:color/black"
+                                android:gravity="center_horizontal"
+                                android:id="@+id/main_alc_day"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"/>
+
+                            <TextView
+                                android:textSize="16sp"
+                                android:textColor="@android:color/black"
+                                android:gravity="center_horizontal"
+                                android:id="@+id/tvCanchigio"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"/>
+
+                            <TextView
+                                android:textSize="16sp"
+                                android:textColor="@android:color/black"
+                                android:gravity="center_horizontal"
+                                android:id="@+id/tvTietkhi"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <!-- Event text -->
+                <TextView
+                    android:textSize="14sp"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:gravity="center_horizontal"
+                    android:id="@+id/main_event"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/main_al_container"
+                    android:layout_centerHorizontal="true"/>
+
+                <!-- Giờ hoàng đạo -->
+                <TextView
+                    android:textSize="14sp"
+                    android:textColor="@android:color/black"
+                    android:id="@+id/tvGioHoangDao"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_below="@+id/main_event"/>
+
+            </RelativeLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+
+    <!-- Bottom Sheet with Calendar -->
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:fitsSystemWindows="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="67dp"
+        app:layout_behavior="io.github.hotroso.vietnameselunarcalendar.ui.LockBottomSheetBehaviour">
+
+        <include layout="@layout/bottom_sheet_content_view"/>
+    </FrameLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/single_line_app_widget_description"
+    android:minWidth="110dp"
+    android:minHeight="40dp"
+    android:updatePeriodMillis="21600000"
+    android:initialLayout="@layout/san_gyou_app_widget"
+    android:configure="io.github.hotroso.vietnameselunarcalendar.widget.AppWidgetConfigActivity"
+    android:previewImage="@drawable/san_gyou_widget_preview"
+    android:resizeMode="vertical|horizontal"
+    android:initialKeyguardLayout="@layout/san_gyou_app_widget"
+    android:widgetCategory="home_screen"/>

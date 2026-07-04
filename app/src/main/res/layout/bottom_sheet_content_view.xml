@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/layoutCalendar"
+    android:paddingBottom="2dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- Drag handle -->
+    <RelativeLayout
+        android:paddingTop="20dp"
+        android:paddingBottom="7dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <View
+            android:background="@drawable/bg_calendar_arrow"
+            android:layout_width="56dp"
+            android:layout_height="4dp"
+            android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
+
+    <!-- Month navigation bar: [<] Tháng X, Năm Y [>] -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:id="@+id/layoutMonthNav"
+        android:gravity="center_vertical"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/btnPrevMonth"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/material_ic_keyboard_arrow_left_black_24dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Tháng trước"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/tvMonthLabel"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tháng 1"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=", "
+                android:textSize="16sp"/>
+
+            <TextView
+                android:id="@+id/tvYearLabel"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorAccent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2026"
+                android:background="?attr/selectableItemBackground"
+                android:padding="4dp"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnNextMonth"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/material_ic_keyboard_arrow_right_black_24dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Tháng sau"/>
+    </LinearLayout>
+
+    <!-- Day of week header -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:id="@+id/calendarViewHeader"
+        android:background="@color/vietcal_gridview_background"
+        android:paddingTop="1dp"
+        android:paddingBottom="2dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView android:textSize="18sp" android:textStyle="bold"
+            android:textColor="@color/cell_text_color"
+            android:background="@color/calendar_header_background"
+            android:padding="5dp" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:text="T2"
+            android:layout_weight="1" android:textAlignment="center"
+            android:layout_marginStart="1dp" android:layout_marginEnd="1dp"/>
+        <TextView android:textSize="18sp" android:textStyle="bold"
+            android:textColor="@color/cell_text_color"
+            android:background="@color/calendar_header_background"
+            android:padding="5dp" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:text="T3"
+            android:layout_weight="1" android:textAlignment="center"
+            android:layout_marginEnd="1dp"/>
+        <TextView android:textSize="18sp" android:textStyle="bold"
+            android:textColor="@color/cell_text_color"
+            android:background="@color/calendar_header_background"
+            android:padding="5dp" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:text="T4"
+            android:layout_weight="1" android:textAlignment="center"
+            android:layout_marginEnd="1dp"/>
+        <TextView android:textSize="18sp" android:textStyle="bold"
+            android:textColor="@color/cell_text_color"
+            android:background="@color/calendar_header_background"
+            android:padding="5dp" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:text="T5"
+            android:layout_weight="1" android:textAlignment="center"
+            android:layout_marginEnd="1dp"/>
+        <TextView android:textSize="18sp" android:textStyle="bold"
+            android:textColor="@color/cell_text_color"
+            android:background="@color/calendar_header_background"
+            android:padding="5dp" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:text="T6"
+            android:layout_weight="1" android:textAlignment="center"
+            android:layout_marginEnd="1dp"/>
+        <TextView android:textSize="18sp" android:textStyle="bold"
+            android:textColor="@color/vietcal_text_t7_color"
+            android:background="@color/calendar_header_background"
+            android:padding="5dp" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:text="T7"
+            android:layout_weight="1" android:textAlignment="center"
+            android:layout_marginEnd="1dp"/>
+        <TextView android:textSize="18sp" android:textStyle="bold"
+            android:textColor="@color/vietcal_text_special_date_color"
+            android:background="@color/calendar_header_background"
+            android:padding="5dp" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:text="CN"
+            android:layout_weight="1" android:textAlignment="center"
+            android:layout_marginEnd="1dp"/>
+    </LinearLayout>
+
+    <!-- Calendar grid -->
+    <io.github.hotroso.vietnameselunarcalendar.ui.CalendarView2
+        android:id="@+id/recyclerView"
+        android:background="@color/calendarview2_cell_normal_date"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</LinearLayout>

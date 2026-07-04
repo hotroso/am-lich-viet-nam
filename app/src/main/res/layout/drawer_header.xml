@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/ivBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_banner"
+        android:scaleType="fitStart"
+        android:adjustViewBounds="true"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:background="@drawable/rounded_background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivBanner">
+
+        <!-- MỞ RỘNG: Entry cho tính năng sự kiện âm lịch -->
+        <TextView
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
+            android:gravity="center_vertical"
+            android:id="@+id/tvEvents"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="  📅 Sự kiện âm lịch"
+            android:textAllCaps="false"/>
+
+        <View
+            android:background="@android:color/darker_gray"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
+
+        <!-- GỐC: Chuyển đổi ngày -->
+        <TextView
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
+            android:gravity="center_vertical"
+            android:id="@+id/tvConvert"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="  Dương lịch ⇄ Âm lịch"
+            android:textAllCaps="false"
+            android:drawableStart="@drawable/ic_calendar_organization"/>
+
+        <View
+            android:background="@android:color/darker_gray"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
+
+        <!-- GỐC: Thông tin -->
+        <TextView
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
+            android:gravity="center_vertical"
+            android:id="@+id/tvInfo"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="  Thông tin"
+            android:textAllCaps="false"
+            android:drawableStart="@drawable/ic_info_circle"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

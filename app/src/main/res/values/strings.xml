@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Âm lịch Việt Nam</string>
+    <string name="app_about">Ứng dụng xem ngày Âm Lịch, chuyển đổi qua lại ngày Dương lịch sang Âm lịch.\n\nMade with ❤ in Hanoi</string>
+    <string name="button_calendar_picker">Button calendar picker</string>
+    <string name="day_title">Tháng %1$d năm %2$d</string>
+    <string name="thang">Tháng</string>
+    <string name="ngay">Ngày</string>
+    <string name="nam">Năm</string>
+    <string name="gio">Giờ</string>
+    <string name="tiet">Tiết</string>
+    <string name="thang_format">Tháng %1$s</string>
+    <string name="nam_format">Năm %1$s</string>
+    <string name="lunar_calendar">Âm lịch</string>
+
+    <!-- Date converter -->
+    <string name="convert_title">Chuyển đổi ngày</string>
+    <string name="solar_calendar">Dương lịch</string>
+    <string name="switch_direction">Đổi chiều chuyển đổi</string>
+
+    <!-- Date detail -->
+    <string name="detail_title">Chi tiết ngày</string>
+    <string name="share">Chia sẻ</string>
+    <string name="close">Đóng</string>
+
+    <!-- Date picker -->
+    <string name="pick_date">Chọn ngày</string>
+    <string name="today">Hôm nay</string>
+    <string name="select">Chọn</string>
+
+    <!-- Widget -->
+    <string name="widget_main_name">Âm lịch - 2x1</string>
+    <string name="widget_1line_name">Âm lịch - 1 dòng</string>
+    <string name="widget_3line_name">Âm lịch - 3 dòng</string>
+    <string name="main_app_widget_description">Hiển thị đầy đủ thông tin ngày Âm lịch hiện tại</string>
+    <string name="single_line_app_widget_description">Hiển thị ngày tháng Âm lịch hiện tại</string>
+
+    <!-- Notification / Permissions -->
+    <string name="notify_event">Thông báo sự kiện</string>
+    <string name="share_with">Chia sẻ với</string>
+    <string name="dialog_post_notification_permission_title">Xác nhận cấp quyền gửi thông báo</string>
+    <string name="dialog_post_notification_permission_content">Bạn có muốn chuyển đến mục cài đặt ứng dụng để cấp quyền gửi thông báo không?</string>
+    <string name="dialog_set_extract_alarm_permission_title">Quyền lên lịch thông báo</string>
+    <string name="dialog_set_extract_alarm_permission_content">Cho phép ứng dụng lên lịch thông báo các sự kiện quan trọng?</string>
+    <string name="dialog_button_yes">Có</string>
+    <string name="dialog_button_not_now">Không phải bây giờ</string>
+    <string name="dialog_button_next">Tiếp theo</string>
+    <string name="dialog_button_no_ask_again">Không hỏi lại nữa</string>
+    <string name="post_notification_permission_required">Cấp quyền thông báo sẽ giúp bạn nhận được thông báo về các sự kiện quan trọng.</string>
+    <string name="toast_post_notification_permission_not_grant">Khi cần bạn vẫn có thể thực hiện sau ở mục cài đặt</string>
+    <string name="snackbar_acction_settings">Cài đặt</string>
+</resources>
