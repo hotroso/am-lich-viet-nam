@@ -14,3 +14,4 @@ referer_source/
 *.jks
 *.keystore
 keystore-base64.txt
+deploy/
