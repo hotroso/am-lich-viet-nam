@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/hotroso/am-lich-viet-nam/raw/main/screenshot.png" alt="Âm Lịch Việt Nam" width="480">
+  <img src="https://github.com/hotroso/am-lich-viet-nam/raw/main/screenshot/demo.gif" alt="Âm Lịch Việt Nam - Demo" width="280">
 </p>
 
 <h1 align="center">🌙 Âm Lịch Việt Nam</h1>
@@ -95,6 +95,10 @@ git push origin v2.3
 ```
 
 GitHub Actions sẽ tự động build APK đã ký, tạo release, và gắn kèm mã QR.
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=hotroso/am-lich-viet-nam&type=Date)](https://star-history.com/#hotroso/am-lich-viet-nam&Date)
 
 ## 🤝 Đóng góp
 

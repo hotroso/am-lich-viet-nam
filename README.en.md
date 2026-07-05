@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/hotroso/am-lich-viet-nam/raw/main/screenshot.png" alt="Vietnamese Lunar Calendar" width="480">
+  <img src="https://github.com/hotroso/am-lich-viet-nam/raw/main/screenshot/demo.gif" alt="Vietnamese Lunar Calendar - Demo" width="280">
 </p>
 
 <h1 align="center">🌙 Vietnamese Lunar Calendar</h1>
@@ -95,6 +95,10 @@ git push origin v2.3
 ```
 
 GitHub Actions will automatically build a signed APK, create a release, and attach a QR code.
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=hotroso/am-lich-viet-nam&type=Date)](https://star-history.com/#hotroso/am-lich-viet-nam&Date)
 
 ## 🤝 Contributing
 
