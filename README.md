@@ -35,6 +35,7 @@
 | 🌿 **24 Tiết Khí** | Theo dõi trọn năm |
 | 🧭 **Hướng xuất hành** | Tài thần, Hỷ thần, Hạc thần |
 | 📌 **Sự kiện & nhắc nhở** | Lưu ngày giỗ, sinh nhật âm lịch — nhắc đúng ngày mỗi năm |
+| 🔔 **Nhắc nhiều mốc** | Đặt nhiều lần nhắc trước cho 1 sự kiện (30 ngày, 7 ngày, 1 ngày...), mỗi mốc có ghi chú riêng |
 | 🔄 **Chuyển đổi ngày** | Dương → Âm, Âm → Dương |
 | 📈 **Sắp tới** | Xem sự kiện trong 90 ngày tới |
 | 📲 **PWA** | Cài về màn hình chính, dùng offline |
