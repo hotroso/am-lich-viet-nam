@@ -7,7 +7,9 @@ import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.Gravity
+import android.view.ViewGroup
 import android.view.Window
+import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -29,11 +31,23 @@ class MonthPickerDialog(
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.dialog_month_picker)
 
+        // Force dialog width to 90% of screen
+        window?.setLayout(
+            (context.resources.displayMetrics.widthPixels * 0.9).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
         val container = findViewById<LinearLayout>(R.id.gridMonths)
         val todayMonth = Calendar.getInstance().get(Calendar.MONTH)
         val todayYear = Calendar.getInstance().get(Calendar.YEAR)
 
-        // Build 4 rows x 3 columns
+        val monthNames = arrayOf(
+            "Tháng 1", "Tháng 2", "Tháng 3",
+            "Tháng 4", "Tháng 5", "Tháng 6",
+            "Tháng 7", "Tháng 8", "Tháng 9",
+            "Tháng 10", "Tháng 11", "Tháng 12"
+        )
+
         for (row in 0 until 4) {
             val rowLayout = LinearLayout(context).apply {
                 orientation = LinearLayout.HORIZONTAL
@@ -45,7 +59,7 @@ class MonthPickerDialog(
 
             for (col in 0 until 3) {
                 val m = row * 3 + col
-                val btn = createCell("Tháng ${m + 1}")
+                val btn = createCell(monthNames[m])
 
                 when {
                     m == currentMonth -> applySelectedStyle(btn)
@@ -58,7 +72,7 @@ class MonthPickerDialog(
                 }
 
                 val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
-                    setMargins(dp(4), dp(4), dp(4), dp(4))
+                    setMargins(dp(3), dp(4), dp(3), dp(4))
                 }
                 rowLayout.addView(btn, params)
             }
@@ -70,9 +84,9 @@ class MonthPickerDialog(
     private fun createCell(text: String): TextView {
         return TextView(context).apply {
             this.text = text
-            textSize = 14f
+            textSize = 13f
             gravity = Gravity.CENTER
-            setPadding(dp(4), dp(14), dp(4), dp(14))
+            setPadding(dp(2), dp(12), dp(2), dp(12))
             setTextColor(Color.parseColor("#212121"))
             val bg = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
@@ -127,6 +141,12 @@ class YearPickerDialog(
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.dialog_year_picker)
 
+        // Force dialog width to 90% of screen
+        window?.setLayout(
+            (context.resources.displayMetrics.widthPixels * 0.9).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
         container = findViewById(R.id.gridYears)
         tvRange = findViewById(R.id.tvYearRange)
 
@@ -149,7 +169,6 @@ class YearPickerDialog(
 
         val todayYear = Calendar.getInstance().get(Calendar.YEAR)
 
-        // Build 3 rows x 4 columns
         for (row in 0 until 3) {
             val rowLayout = LinearLayout(context).apply {
                 orientation = LinearLayout.HORIZONTAL
@@ -175,7 +194,7 @@ class YearPickerDialog(
                 }
 
                 val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
-                    setMargins(dp(4), dp(4), dp(4), dp(4))
+                    setMargins(dp(3), dp(4), dp(3), dp(4))
                 }
                 rowLayout.addView(btn, params)
             }
@@ -187,9 +206,9 @@ class YearPickerDialog(
     private fun createCell(text: String): TextView {
         return TextView(context).apply {
             this.text = text
-            textSize = 14f
+            textSize = 13f
             gravity = Gravity.CENTER
-            setPadding(dp(4), dp(14), dp(4), dp(14))
+            setPadding(dp(2), dp(12), dp(2), dp(12))
             setTextColor(Color.parseColor("#212121"))
             val bg = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
