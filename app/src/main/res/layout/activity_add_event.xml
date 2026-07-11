@@ -40,265 +40,226 @@
 
         <View android:layout_width="match_parent" android:layout_height="20dp"/>
 
-        <!-- Lunar date section -->
+        <!-- Lunar date -->
         <TextView
-            android:textStyle="bold"
-            android:textSize="16sp"
+            android:textStyle="bold" android:textSize="16sp"
             android:text="Ngày âm lịch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"/>
 
-        <!-- Row: Ngày / Tháng / Năm -->
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+            android:layout_width="match_parent" android:layout_height="wrap_content">
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="6dp"
-                android:hint="Ngày">
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:layout_marginEnd="6dp" android:hint="Ngày">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etLunarDay"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:inputType="number"/>
             </com.google.android.material.textfield.TextInputLayout>
-
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="6dp"
-                android:hint="Tháng">
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:layout_marginEnd="6dp" android:hint="Tháng">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etLunarMonth"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:inputType="number"/>
             </com.google.android.material.textfield.TextInputLayout>
-
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Năm (tùy chọn)">
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:hint="Năm (tùy chọn)">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etLunarYear"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:inputType="number"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- Leap month: auto-detected info or manual checkbox -->
         <LinearLayout
-            android:id="@+id/layoutLeapMonth"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="6dp">
-
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/cbLeapMonth"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Tháng nhuận"/>
-
             <TextView
                 android:id="@+id/tvLeapInfo"
-                android:textSize="12sp"
-                android:textColor="@color/vietcal_text_t7_color"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
+                android:textSize="12sp" android:textColor="@color/vietcal_text_t7_color"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:layout_marginStart="8dp"
                 android:visibility="gone"/>
         </LinearLayout>
 
         <View android:layout_width="match_parent" android:layout_height="20dp"/>
 
-        <!-- Event type (mới thêm) -->
-        <TextView
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:text="Loại sự kiện"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <!-- Event type -->
+        <TextView android:textStyle="bold" android:textSize="16sp" android:text="Loại sự kiện"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"/>
-
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chipGroupEventType"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:singleSelection="true"
-            app:selectionRequired="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipGio"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            app:singleSelection="true" app:selectionRequired="true">
+            <com.google.android.material.chip.Chip android:id="@+id/chipGio"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ngày giỗ"
-                android:checked="true"/>
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipSinhNhat"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Ngày giỗ" android:checked="true"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipSinhNhat"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Sinh nhật"/>
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipLe"
+            <com.google.android.material.chip.Chip android:id="@+id/chipLe"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Ngày lễ"/>
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipKhac"
+            <com.google.android.material.chip.Chip android:id="@+id/chipKhac"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Khác"/>
         </com.google.android.material.chip.ChipGroup>
 
         <View android:layout_width="match_parent" android:layout_height="20dp"/>
 
         <!-- Repeat -->
-        <TextView
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:text="Tần suất nhắc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <TextView android:textStyle="bold" android:textSize="16sp" android:text="Tần suất nhắc"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"/>
-
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chipGroupRepeat"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
             app:singleSelection="true">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipYearly"
+            <com.google.android.material.chip.Chip android:id="@+id/chipYearly"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Hàng năm"
-                android:checked="true"/>
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipMonthly"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Hàng năm" android:checked="true"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipMonthly"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Hàng tháng"/>
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipOnce"
+            <com.google.android.material.chip.Chip android:id="@+id/chipOnce"
                 style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
                 android:text="Một lần"/>
         </com.google.android.material.chip.ChipGroup>
 
         <View android:layout_width="match_parent" android:layout_height="20dp"/>
 
-        <!-- Remind days before -->
-        <TextView
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:text="Nhắc trước"
-            android:layout_width="wrap_content"
+        <!-- MULTI-REMINDER SECTION -->
+        <TextView android:textStyle="bold" android:textSize="16sp"
+            android:text="Mốc nhắc nhở (chọn nhiều)"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Danh sách mốc nhắc hiện tại -->
+        <LinearLayout
+            android:id="@+id/reminderListContainer"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"/>
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chipGroupDaysBefore"
+        <!-- Input: thêm mốc mới -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:singleSelection="true">
+            android:layout_marginBottom="6dp">
+            <EditText
+                android:id="@+id/etReminderDays"
+                android:layout_width="52dp"
+                android:layout_height="40dp"
+                android:inputType="number"
+                android:hint="Ngày"
+                android:textSize="13sp"
+                android:gravity="center"
+                android:background="@drawable/textview_border"
+                android:padding="4dp"/>
+            <EditText
+                android:id="@+id/etReminderNote"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:inputType="text"
+                android:hint="Ghi chú cho mốc này"
+                android:textSize="13sp"
+                android:background="@drawable/textview_border"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddReminder"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="+"
+                android:textSize="18sp"
+                android:textColor="@color/colorSecondary"
+                android:layout_marginStart="4dp"/>
+        </LinearLayout>
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipSameDay"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Đúng ngày"/>
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip1Day"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1 ngày"
-                android:checked="true"/>
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip2Days"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2 ngày"/>
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip7Days"
-                style="@style/Widget.MaterialComponents.Chip.Choice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1 tuần"/>
+        <!-- Preset chips -->
+        <com.google.android.material.chip.ChipGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:singleSelection="false">
+            <com.google.android.material.chip.Chip android:id="@+id/chipPresetSameDay"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Đúng ngày" android:textSize="12sp"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipPreset1Day"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="1 ngày" android:textSize="12sp"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipPreset7Days"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="1 tuần" android:textSize="12sp"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipPreset14Days"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="2 tuần" android:textSize="12sp"/>
+            <com.google.android.material.chip.Chip android:id="@+id/chipPreset30Days"
+                style="@style/Widget.MaterialComponents.Chip.Action"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="1 tháng" android:textSize="12sp"/>
         </com.google.android.material.chip.ChipGroup>
 
         <View android:layout_width="match_parent" android:layout_height="20dp"/>
 
-        <!-- Remind time -->
-        <TextView
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:text="Giờ nhắc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <!-- Time -->
+        <TextView android:textStyle="bold" android:textSize="16sp" android:text="Giờ nhắc"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"/>
-
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnPickTime"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:text="08:00"
-            app:strokeColor="@color/colorSecondary"
-            android:textColor="@color/colorSecondary"/>
+            app:strokeColor="@color/colorSecondary" android:textColor="@color/colorSecondary"/>
 
         <View android:layout_width="match_parent" android:layout_height="28dp"/>
 
-        <!-- Buttons row -->
+        <!-- Buttons -->
         <LinearLayout
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginBottom="16dp">
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancel"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:text="Hủy"
-                android:textAllCaps="false"
-                app:strokeColor="@color/colorSecondary"
-                android:textColor="@color/colorSecondary"/>
-
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:layout_marginEnd="8dp"
+                android:text="Hủy" android:textAllCaps="false"
+                app:strokeColor="@color/colorSecondary" android:textColor="@color/colorSecondary"/>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSave"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp" android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Lưu"
-                android:textAllCaps="false"
-                app:backgroundTint="@color/colorSecondary"
-                android:textColor="@android:color/white"/>
+                android:text="Lưu" android:textAllCaps="false"
+                app:backgroundTint="@color/colorSecondary" android:textColor="@android:color/white"/>
         </LinearLayout>
-
     </LinearLayout>
 </ScrollView>
