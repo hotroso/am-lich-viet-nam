@@ -4,7 +4,7 @@
  */
 
 const NotificationManager = (() => {
-    const CHECK_INTERVAL = 60 * 60 * 1000; // Check every hour
+    const CHECK_INTERVAL = 60 * 1000; // Check every 1 minute for precise timing
     let checkTimer = null;
 
     /**
@@ -158,8 +158,14 @@ const NotificationManager = (() => {
                 const remindHour = evt.remindHour || 7;
                 const remindMinute = evt.remindMinute || 0;
 
-                // Check if it's time to notify (within the current hour)
-                if (currentHour === remindHour && Math.abs(currentMinute - remindMinute) < 30) {
+                // Check if it's time to notify
+                // Match exact hour and within 5-minute window of the target minute
+                // OR if we missed it (app was suspended), fire if we're past the time but same hour
+                const isExactTime = currentHour === remindHour && currentMinute >= remindMinute && currentMinute <= remindMinute + 5;
+                // Also handle case where app was suspended and resumed after target time (same day)
+                const isPastTime = (currentHour > remindHour) || (currentHour === remindHour && currentMinute > remindMinute + 5);
+
+                if (isExactTime || isPastTime) {
                     // Check if already notified today
                     const notifiedKey = `notified_${evt.id}_${today.day}_${today.month}_${today.year}`;
                     if (!localStorage.getItem(notifiedKey)) {
@@ -281,6 +287,21 @@ const NotificationManager = (() => {
                 }
             });
         }
+
+        // iOS Safari: when app comes back from background, check immediately
+        // visibilitychange fires when user switches back to the PWA
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && getPermission() === 'granted') {
+                checkTodayEvents();
+            }
+        });
+
+        // Also check on focus (belt and suspenders for iOS)
+        window.addEventListener('focus', () => {
+            if (getPermission() === 'granted') {
+                checkTodayEvents();
+            }
+        });
     }
 
     return {
