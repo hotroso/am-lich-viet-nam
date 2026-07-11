@@ -12,24 +12,46 @@ import java.util.TimeZone
 
 /**
  * Lên lịch notification cho các sự kiện âm lịch.
+ * Hỗ trợ multi-reminder: mỗi event có thể có nhiều mốc nhắc,
+ * mỗi mốc tạo 1 alarm riêng.
  *
- * Logic:
- * 1. Tính ngày dương lịch tương ứng cho sự kiện âm lịch (năm hiện tại hoặc năm tới)
- * 2. Trừ đi số ngày nhắc trước (remindDaysBefore)
- * 3. Đặt alarm vào giờ đã chọn (remindHour:remindMinute)
+ * Request code format: BASE + eventId * 100 + reminderIndex
+ * Cho phép tối đa 100 mốc nhắc / event (thực tế ~5-10).
  */
 object ReminderScheduler {
 
     private const val REQUEST_CODE_BASE = 10000
 
     /**
-     * Lên lịch alarm cho 1 event cụ thể.
-     * Trả về thời điểm alarm (millis) hoặc -1 nếu không lên lịch được.
+     * Lên lịch alarm cho tất cả mốc nhắc của 1 event.
      */
-    fun scheduleEvent(context: Context, event: LunarEvent): Long {
-        if (!event.isEnabled) return -1
+    suspend fun scheduleEvent(context: Context, event: LunarEvent) {
+        if (!event.isEnabled) return
 
-        val alarmTime = calculateNextAlarmTime(event) ?: return -1
+        val db = AppDatabase.getInstance(context)
+        val reminders = db.reminderItemDao().getRemindersForEvent(event.id)
+
+        if (reminders.isEmpty()) {
+            // Backward compat: dùng remindDaysBefore cũ
+            scheduleOneAlarm(context, event, event.remindDaysBefore, "", 0)
+        } else {
+            reminders.forEachIndexed { index, reminder ->
+                scheduleOneAlarm(context, event, reminder.daysBefore, reminder.note, index)
+            }
+        }
+    }
+
+    /**
+     * Lên lịch 1 alarm cho 1 mốc nhắc cụ thể.
+     */
+    private fun scheduleOneAlarm(
+        context: Context,
+        event: LunarEvent,
+        daysBefore: Int,
+        reminderNote: String,
+        reminderIndex: Int
+    ) {
+        val alarmTime = calculateNextAlarmTime(event, daysBefore) ?: return
 
         val intent = Intent(context, ReminderReceiver::class.java).apply {
             putExtra(ReminderReceiver.EXTRA_EVENT_ID, event.id)
@@ -37,11 +59,14 @@ object ReminderScheduler {
             putExtra(ReminderReceiver.EXTRA_EVENT_NOTE, event.note)
             putExtra(ReminderReceiver.EXTRA_LUNAR_DAY, event.lunarDay)
             putExtra(ReminderReceiver.EXTRA_LUNAR_MONTH, event.lunarMonth)
+            putExtra(ReminderReceiver.EXTRA_DAYS_BEFORE, daysBefore)
+            putExtra(ReminderReceiver.EXTRA_REMINDER_NOTE, reminderNote)
         }
 
+        val requestCode = REQUEST_CODE_BASE + (event.id * 100).toInt() + reminderIndex
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            (REQUEST_CODE_BASE + event.id).toInt(),
+            requestCode,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -54,7 +79,6 @@ object ReminderScheduler {
                     AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent
                 )
             } else {
-                // Fallback: inexact alarm
                 alarmManager.set(AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent)
             }
         } else {
@@ -62,24 +86,17 @@ object ReminderScheduler {
                 AlarmManager.RTC_WAKEUP, alarmTime, pendingIntent
             )
         }
-
-        return alarmTime
     }
 
     /**
-     * Tính thời điểm alarm tiếp theo cho event.
-     * Chuyển ngày âm → dương, trừ đi ngày nhắc trước, set giờ.
+     * Tính thời điểm alarm cho 1 mốc nhắc cụ thể.
      */
-    private fun calculateNextAlarmTime(event: LunarEvent): Long? {
+    private fun calculateNextAlarmTime(event: LunarEvent, daysBefore: Int): Long? {
         val now = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"))
         val currentYear = now.get(Calendar.YEAR)
 
-        // Tính ngày dương cho năm nay và năm sau
-        val candidates = mutableListOf<Calendar>()
-
         when (event.repeat) {
             ReminderRepeat.YEARLY, ReminderRepeat.ONCE -> {
-                // Thử năm nay trước
                 for (yearOffset in 0..1) {
                     val targetYear = currentYear + yearOffset
                     val solar = lunarToSolarSafe(
@@ -87,15 +104,13 @@ object ReminderScheduler {
                         if (event.isLeapMonth) 1 else 0
                     ) ?: continue
 
-                    val cal = toCalendarWithReminder(solar, event)
+                    val cal = toCalendarWithDaysBefore(solar, event, daysBefore)
                     if (cal.after(now)) {
-                        candidates.add(cal)
-                        break
+                        return cal.timeInMillis
                     }
                 }
             }
             ReminderRepeat.MONTHLY -> {
-                // Tháng hiện tại và tháng sau (âm lịch)
                 val todayLunar = VietCalendar.solarToLunar(
                     now.get(Calendar.DAY_OF_MONTH),
                     now.get(Calendar.MONTH) + 1,
@@ -112,25 +127,21 @@ object ReminderScheduler {
                         event.lunarDay, targetMonth, targetYear, 0
                     ) ?: continue
 
-                    val cal = toCalendarWithReminder(solar, event)
+                    val cal = toCalendarWithDaysBefore(solar, event, daysBefore)
                     if (cal.after(now)) {
-                        candidates.add(cal)
-                        break
+                        return cal.timeInMillis
                     }
                 }
             }
             ReminderRepeat.WEEKLY -> {
-                // Nhắc hàng tuần: lấy ngày alarm tiếp theo dựa trên ngày hiện tại
                 val cal = (now.clone() as Calendar).apply {
                     set(Calendar.HOUR_OF_DAY, event.remindHour)
                     set(Calendar.MINUTE, event.remindMinute)
                     set(Calendar.SECOND, 0)
                     set(Calendar.MILLISECOND, 0)
                 }
-                if (!cal.after(now)) {
-                    cal.add(Calendar.WEEK_OF_YEAR, 1)
-                }
-                candidates.add(cal)
+                if (!cal.after(now)) cal.add(Calendar.WEEK_OF_YEAR, 1)
+                return cal.timeInMillis
             }
             ReminderRepeat.DAILY -> {
                 val cal = (now.clone() as Calendar).apply {
@@ -139,33 +150,22 @@ object ReminderScheduler {
                     set(Calendar.SECOND, 0)
                     set(Calendar.MILLISECOND, 0)
                 }
-                if (!cal.after(now)) {
-                    cal.add(Calendar.DAY_OF_MONTH, 1)
-                }
-                candidates.add(cal)
+                if (!cal.after(now)) cal.add(Calendar.DAY_OF_MONTH, 1)
+                return cal.timeInMillis
             }
         }
-
-        return candidates.minByOrNull { it.timeInMillis }?.timeInMillis
+        return null
     }
 
-    /**
-     * Chuyển đổi ngày âm → dương an toàn (trả null nếu không hợp lệ).
-     */
     private fun lunarToSolarSafe(
         lunarDay: Int, lunarMonth: Int, lunarYear: Int, leapMonth: Int
     ): SolarDate? {
         return try {
             VietCalendar.lunarToSolar(lunarDay, lunarMonth, lunarYear, leapMonth)
-        } catch (e: Exception) {
-            null
-        }
+        } catch (e: Exception) { null }
     }
 
-    /**
-     * Tạo Calendar từ ngày dương + thông tin nhắc trước.
-     */
-    private fun toCalendarWithReminder(solar: SolarDate, event: LunarEvent): Calendar {
+    private fun toCalendarWithDaysBefore(solar: SolarDate, event: LunarEvent, daysBefore: Int): Calendar {
         return Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh")).apply {
             set(Calendar.YEAR, solar.year)
             set(Calendar.MONTH, solar.month - 1)
@@ -174,32 +174,33 @@ object ReminderScheduler {
             set(Calendar.MINUTE, event.remindMinute)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
-            // Trừ đi số ngày nhắc trước
-            add(Calendar.DAY_OF_MONTH, -event.remindDaysBefore)
+            add(Calendar.DAY_OF_MONTH, -daysBefore)
         }
     }
 
     /**
-     * Hủy alarm cho 1 event.
+     * Hủy tất cả alarm cho 1 event (lên đến 100 mốc).
      */
     fun cancelEvent(context: Context, eventId: Long) {
-        val intent = Intent(context, ReminderReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            (REQUEST_CODE_BASE + eventId).toInt(),
-            intent,
-            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
-        )
-        if (pendingIntent != null) {
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            alarmManager.cancel(pendingIntent)
-            pendingIntent.cancel()
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        for (i in 0 until 100) {
+            val requestCode = REQUEST_CODE_BASE + (eventId * 100).toInt() + i
+            val intent = Intent(context, ReminderReceiver::class.java)
+            val pendingIntent = PendingIntent.getBroadcast(
+                context, requestCode, intent,
+                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+            )
+            if (pendingIntent != null) {
+                alarmManager.cancel(pendingIntent)
+                pendingIntent.cancel()
+            } else {
+                break // Không còn alarm nào
+            }
         }
     }
 
     /**
      * Lên lịch lại tất cả event đang enabled.
-     * Gọi khi app khởi động hoặc sau khi device restart.
      */
     suspend fun rescheduleAll(context: Context) {
         val db = AppDatabase.getInstance(context)

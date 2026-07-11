@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Layout cho mỗi mốc nhắc nhở trong danh sách -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:background="@drawable/rounded_background"
+    android:layout_marginBottom="6dp">
+
+    <!-- Badge: số ngày -->
+    <TextView
+        android:id="@+id/tvDaysBefore"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorSecondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="70dp"/>
+
+    <!-- Note cho mốc này -->
+    <TextView
+        android:id="@+id/tvReminderNote"
+        android:textSize="13sp"
+        android:textColor="@android:color/black"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="8dp"
+        android:ellipsize="end"
+        android:maxLines="2"/>
+
+    <!-- Nút xóa -->
+    <ImageButton
+        android:id="@+id/btnRemoveReminder"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_baseline_close_24"
+        android:scaleType="centerInside"
+        android:contentDescription="Xóa mốc nhắc"/>
+</LinearLayout>
