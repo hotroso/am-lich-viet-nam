@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head><title>Icon Generator</title></head>
+<body>
+<p>Open this file in a browser, right-click each canvas to save as PNG.</p>
+<script>
+const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+sizes.forEach(size => {
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#b71c1c';
+    ctx.beginPath();
+    ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `bold ${size * 0.35}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('陰', size/2, size/2 - size*0.1);
+
+    ctx.font = `${size * 0.12}px sans-serif`;
+    ctx.fillText('Âm Lịch VN', size/2, size/2 + size*0.25);
+
+    document.body.appendChild(canvas);
+    const label = document.createElement('p');
+    label.textContent = `icon-${size}.png`;
+    document.body.appendChild(label);
+});
+</script>
+</body>
+</html>

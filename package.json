@@ -1,0 +1,11 @@
+{
+  "name": "am-lich-viet-nam-pwa",
+  "version": "2.0.0",
+  "description": "Âm Lịch Việt Nam - Progressive Web App",
+  "scripts": {
+    "start": "npx serve . -l 3000",
+    "dev": "npx serve . -l 3000"
+  },
+  "keywords": ["lunar-calendar", "vietnamese", "pwa"],
+  "license": "MIT"
+}
