@@ -430,6 +430,7 @@ body {
     background: var(--cell-border);
     gap: 1px;
     flex: 1;
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 .calendar-cell {
