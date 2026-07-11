@@ -124,7 +124,26 @@ const App = (() => {
         document.getElementById('info-day-rating').addEventListener('click', showDateDetail);
 
         // Year label click
-        document.getElementById('year-label').addEventListener('click', showYearPicker);
+        document.getElementById('year-label').addEventListener('click', toggleYearPicker);
+        document.getElementById('month-label').addEventListener('click', toggleMonthPicker);
+        document.getElementById('btn-year-prev').addEventListener('click', () => navigateYearPicker(-12));
+        document.getElementById('btn-year-next').addEventListener('click', () => navigateYearPicker(12));
+
+        // Close pickers on outside click
+        document.addEventListener('click', (e) => {
+            const monthPicker = document.getElementById('month-picker');
+            const yearPicker = document.getElementById('year-picker');
+            const monthLabel = document.getElementById('month-label');
+            const yearLabel = document.getElementById('year-label');
+            if (!monthPicker.contains(e.target) && e.target !== monthLabel) {
+                monthPicker.classList.add('hidden');
+                monthLabel.classList.remove('active');
+            }
+            if (!yearPicker.contains(e.target) && e.target !== yearLabel && !e.target.closest('.picker-year-nav')) {
+                yearPicker.classList.add('hidden');
+                yearLabel.classList.remove('active');
+            }
+        });
 
         // Sidebar nav
         document.getElementById('nav-events').addEventListener('click', (e) => { e.preventDefault(); closeSidebar(); openEventList(); });
@@ -430,6 +449,7 @@ const App = (() => {
         currentMonth += delta;
         if (currentMonth > 12) { currentMonth = 1; currentYear++; }
         if (currentMonth < 1) { currentMonth = 12; currentYear--; }
+        closeAllPickers();
         renderCalendar();
     }
 
@@ -443,11 +463,106 @@ const App = (() => {
     }
 
     function showYearPicker() {
-        const year = prompt('Chọn năm (1900-2100):', currentYear);
-        if (year && parseInt(year) >= 1900 && parseInt(year) <= 2100) {
-            currentYear = parseInt(year);
-            renderCalendar();
+        // replaced by toggleYearPicker
+    }
+
+    // ============ MONTH/YEAR PICKERS (dropdown grid) ============
+    let yearPickerBase = 0;
+
+    function toggleMonthPicker() {
+        const picker = document.getElementById('month-picker');
+        const yearPicker = document.getElementById('year-picker');
+        const monthLabel = document.getElementById('month-label');
+        const yearLabel = document.getElementById('year-label');
+
+        yearPicker.classList.add('hidden');
+        yearLabel.classList.remove('active');
+
+        if (picker.classList.contains('hidden')) {
+            renderMonthPicker();
+            picker.classList.remove('hidden');
+            monthLabel.classList.add('active');
+        } else {
+            picker.classList.add('hidden');
+            monthLabel.classList.remove('active');
         }
+    }
+
+    function renderMonthPicker() {
+        const grid = document.getElementById('month-picker-grid');
+        grid.innerHTML = '';
+        const todayMonth = new Date().getMonth() + 1;
+        const todayYear = new Date().getFullYear();
+
+        for (let m = 1; m <= 12; m++) {
+            const btn = document.createElement('button');
+            btn.className = 'picker-cell';
+            btn.textContent = `Tháng ${m}`;
+            if (m === currentMonth) btn.classList.add('current');
+            if (m === todayMonth && currentYear === todayYear) btn.classList.add('today-marker');
+            btn.addEventListener('click', () => {
+                currentMonth = m;
+                closeAllPickers();
+                renderCalendar();
+            });
+            grid.appendChild(btn);
+        }
+    }
+
+    function toggleYearPicker() {
+        const picker = document.getElementById('year-picker');
+        const monthPicker = document.getElementById('month-picker');
+        const yearLabel = document.getElementById('year-label');
+        const monthLabel = document.getElementById('month-label');
+
+        monthPicker.classList.add('hidden');
+        monthLabel.classList.remove('active');
+
+        if (picker.classList.contains('hidden')) {
+            yearPickerBase = currentYear - (currentYear % 12);
+            renderYearPicker();
+            picker.classList.remove('hidden');
+            yearLabel.classList.add('active');
+        } else {
+            picker.classList.add('hidden');
+            yearLabel.classList.remove('active');
+        }
+    }
+
+    function renderYearPicker() {
+        const grid = document.getElementById('year-picker-grid');
+        grid.innerHTML = '';
+        const todayYear = new Date().getFullYear();
+        const rangeStart = yearPickerBase;
+        const rangeEnd = yearPickerBase + 11;
+
+        document.getElementById('year-picker-range').textContent = `${rangeStart} - ${rangeEnd}`;
+
+        for (let y = rangeStart; y <= rangeEnd; y++) {
+            const btn = document.createElement('button');
+            btn.className = 'picker-cell';
+            btn.textContent = y;
+            if (y === currentYear) btn.classList.add('current');
+            if (y === todayYear) btn.classList.add('today-marker');
+            btn.addEventListener('click', () => {
+                currentYear = y;
+                closeAllPickers();
+                renderCalendar();
+            });
+            grid.appendChild(btn);
+        }
+    }
+
+    function navigateYearPicker(delta) {
+        yearPickerBase += delta;
+        renderYearPicker();
+    }
+
+    function closeAllPickers() {
+        document.getElementById('month-picker').classList.add('hidden');
+        document.getElementById('year-picker').classList.add('hidden');
+        document.getElementById('month-label').classList.remove('active');
+        document.getElementById('year-label').classList.remove('active');
     }
 
     // ============ SIDEBAR ============
