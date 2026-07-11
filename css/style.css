@@ -983,9 +983,9 @@ body {
 }
 
 .remind-input {
-    width: 44px;
-    max-width: 44px;
-    flex: 0 0 44px;
+    width: 52px;
+    max-width: 52px;
+    flex: 0 0 52px;
     padding: 8px 4px;
     border: 1px solid var(--border);
     border-radius: 8px;
