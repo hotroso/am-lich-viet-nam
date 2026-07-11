@@ -848,37 +848,6 @@ const App = (() => {
     // ============ ABOUT ============
     function showAbout() {
         toggleModal('modal-about', true);
-        generateQRCode();
-    }
-
-    /**
-     * Generate QR Code on canvas (minimal implementation, no library)
-     * Uses a simple approach: draw QR via third-party image or manual encoding
-     */
-    function generateQRCode() {
-        const canvas = document.getElementById('qr-canvas');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        const url = 'https://amlich.hotrogiaiphapso.info/';
-
-        // Use Google Charts API for QR (lightweight, no dependency)
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => {
-            ctx.clearRect(0, 0, 180, 180);
-            ctx.drawImage(img, 0, 0, 180, 180);
-        };
-        img.onerror = () => {
-            // Fallback: draw a placeholder
-            ctx.fillStyle = '#f0f0f0';
-            ctx.fillRect(0, 0, 180, 180);
-            ctx.fillStyle = '#333';
-            ctx.font = '12px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('QR Code', 90, 85);
-            ctx.fillText(url, 90, 105);
-        };
-        img.src = `https://chart.googleapis.com/chart?cht=qr&chs=180x180&chl=${encodeURIComponent(url)}&choe=UTF-8`;
     }
 
     // ============ TOAST ============
