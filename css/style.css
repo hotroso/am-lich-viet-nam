@@ -984,11 +984,20 @@ body {
 
 .remind-input {
     width: 44px;
+    max-width: 44px;
+    flex: 0 0 44px;
     padding: 8px 4px;
     border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 0.85rem;
     text-align: center;
+    -moz-appearance: textfield;
+}
+
+.remind-input::-webkit-inner-spin-button,
+.remind-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .remind-note-input {
