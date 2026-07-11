@@ -36,6 +36,7 @@ There are plenty of lunar calendar apps out there, but most are cluttered with a
 | 📖 **28 Lunar Mansions** | Detailed info on the 28 stars governing each day |
 | 🧭 **Lucky directions** | Wealth God, Happiness God, and Crane God directions for each day |
 | 📌 **Lunar events & reminders** | Save death anniversaries and lunar birthdays — the app reminds you automatically every year |
+| 🔔 **Multi-milestone reminders** | Set multiple reminder points per event (30 days, 7 days, 1 day before...), each with its own note (e.g., "Book flight tickets", "Buy offerings") |
 | 🎂 **Smart anniversary tracking** | Automatically calculates and displays milestone ages and anniversaries |
 | 📱 **3 home screen widgets** | Check the calendar right from your home screen, no need to open the app |
 | 📤 **Quick sharing** | Share the day's info via messaging apps or social media in one tap |
@@ -45,8 +46,21 @@ There are plenty of lunar calendar apps out there, but most are cluttered with a
 | Channel | Link |
 |---|---|
 | GitHub Release | [Download APK](https://github.com/hotroso/am-lich-viet-nam/releases/latest) |
+| Web Version (PWA) | [amlich.hotrogiaiphapso.info](https://amlich.hotrogiaiphapso.info/) |
 
 > Scan the QR code on the Release page to download directly to your phone.
+
+## 🌐 Web Version
+
+In addition to the Android app, there is a **Progressive Web App (PWA)** version that runs directly in the browser, supporting all platforms (iOS, Android, Desktop):
+
+👉 **[https://amlich.hotrogiaiphapso.info/](https://amlich.hotrogiaiphapso.info/)**
+
+- Same UI as the Android native app
+- Works offline after the first visit
+- Add to Home Screen to use like a native app
+- Supports Safari iOS, Chrome, Firefox, Edge
+- Source code: [`webapp` branch](https://github.com/hotroso/am-lich-viet-nam/tree/webapp)
 
 ## ✅ Requirements
 
