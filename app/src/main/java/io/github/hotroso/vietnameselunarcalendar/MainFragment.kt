@@ -8,9 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.NumberPicker
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -25,6 +23,8 @@ import io.github.hotroso.vietnameselunarcalendar.reminder.AppDatabase
 import io.github.hotroso.vietnameselunarcalendar.reminder.LunarEvent
 import io.github.hotroso.vietnameselunarcalendar.ui.CalendarView2
 import io.github.hotroso.vietnameselunarcalendar.ui.DigitalClock
+import io.github.hotroso.vietnameselunarcalendar.ui.MonthPickerDialog
+import io.github.hotroso.vietnameselunarcalendar.ui.YearPickerDialog
 
 class MainFragment : Fragment() {
 
@@ -244,7 +244,12 @@ class MainFragment : Fragment() {
             navigateMonth(1)
         }
 
-        // Tap năm → hiện dialog chọn năm
+        // Tap tháng → hiện grid chọn tháng
+        tvMonthLabel.setOnClickListener {
+            showMonthPickerDialog()
+        }
+
+        // Tap năm → hiện grid chọn năm
         tvYearLabel.setOnClickListener {
             showYearPickerDialog()
         }
@@ -268,25 +273,22 @@ class MainFragment : Fragment() {
 
     private fun showYearPickerDialog() {
         val currentYear = calendarView.year
-        val numberPicker = NumberPicker(requireContext()).apply {
-            minValue = 1900
-            maxValue = 2100
-            value = currentYear
-            wrapSelectorWheel = false
-        }
+        YearPickerDialog(requireContext(), currentYear) { selectedYear ->
+            val month = calendarView.month
+            calendarView.setMonth(selectedYear, month, 1)
+            updateMonthNavLabel(month, selectedYear)
+            viewModel.selectDate(1, month + 1, selectedYear)
+        }.show()
+    }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("Chọn năm")
-            .setView(numberPicker)
-            .setPositiveButton("OK") { _, _ ->
-                val selectedYear = numberPicker.value
-                val month = calendarView.month
-                calendarView.setMonth(selectedYear, month, 1)
-                updateMonthNavLabel(month, selectedYear)
-                viewModel.selectDate(1, month + 1, selectedYear)
-            }
-            .setNegativeButton("Hủy", null)
-            .show()
+    private fun showMonthPickerDialog() {
+        val currentMonth = calendarView.month // 0-based
+        val currentYear = calendarView.year
+        MonthPickerDialog(requireContext(), currentMonth, currentYear) { selectedMonth ->
+            calendarView.setMonth(currentYear, selectedMonth, 1)
+            updateMonthNavLabel(selectedMonth, currentYear)
+            viewModel.selectDate(1, selectedMonth + 1, currentYear)
+        }.show()
     }
 
     private fun updateMonthNavLabel(month: Int, year: Int) {

@@ -1,0 +1,246 @@
+package io.github.hotroso.vietnameselunarcalendar.ui
+
+import android.app.Dialog
+import android.content.Context
+import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
+import android.os.Bundle
+import android.view.Gravity
+import android.view.ViewGroup
+import android.view.Window
+import android.view.WindowManager
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.TextView
+import io.github.hotroso.vietnameselunarcalendar.R
+import java.util.Calendar
+
+/**
+ * Dialog chọn tháng dạng grid 3 cột x 4 hàng.
+ */
+class MonthPickerDialog(
+    context: Context,
+    private val currentMonth: Int, // 0-based
+    private val currentYear: Int,
+    private val onMonthSelected: (month: Int) -> Unit
+) : Dialog(context) {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        setContentView(R.layout.dialog_month_picker)
+
+        // Force dialog width to 90% of screen
+        window?.setLayout(
+            (context.resources.displayMetrics.widthPixels * 0.9).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        val container = findViewById<LinearLayout>(R.id.gridMonths)
+        val todayMonth = Calendar.getInstance().get(Calendar.MONTH)
+        val todayYear = Calendar.getInstance().get(Calendar.YEAR)
+
+        val monthNames = arrayOf(
+            "Tháng 1", "Tháng 2", "Tháng 3",
+            "Tháng 4", "Tháng 5", "Tháng 6",
+            "Tháng 7", "Tháng 8", "Tháng 9",
+            "Tháng 10", "Tháng 11", "Tháng 12"
+        )
+
+        for (row in 0 until 4) {
+            val rowLayout = LinearLayout(context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+            }
+
+            for (col in 0 until 3) {
+                val m = row * 3 + col
+                val btn = createCell(monthNames[m])
+
+                when {
+                    m == currentMonth -> applySelectedStyle(btn)
+                    m == todayMonth && currentYear == todayYear -> applyTodayStyle(btn)
+                }
+
+                btn.setOnClickListener {
+                    onMonthSelected(m)
+                    dismiss()
+                }
+
+                val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                    setMargins(dp(3), dp(4), dp(3), dp(4))
+                }
+                rowLayout.addView(btn, params)
+            }
+
+            container.addView(rowLayout)
+        }
+    }
+
+    private fun createCell(text: String): TextView {
+        return TextView(context).apply {
+            this.text = text
+            textSize = 13f
+            gravity = Gravity.CENTER
+            setPadding(dp(2), dp(12), dp(2), dp(12))
+            setTextColor(Color.parseColor("#212121"))
+            val bg = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = dp(8).toFloat()
+                setColor(Color.parseColor("#f5f5f5"))
+            }
+            background = bg
+        }
+    }
+
+    private fun applySelectedStyle(tv: TextView) {
+        val bg = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dp(8).toFloat()
+            setColor(Color.parseColor("#b22b23"))
+        }
+        tv.background = bg
+        tv.setTextColor(Color.WHITE)
+        tv.typeface = Typeface.DEFAULT_BOLD
+    }
+
+    private fun applyTodayStyle(tv: TextView) {
+        val bg = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dp(8).toFloat()
+            setColor(Color.parseColor("#f5f5f5"))
+            setStroke(dp(2), Color.parseColor("#d4a56f"))
+        }
+        tv.background = bg
+    }
+
+    private fun dp(value: Int): Int {
+        return (value * context.resources.displayMetrics.density).toInt()
+    }
+}
+
+/**
+ * Dialog chọn năm dạng grid 4 cột x 3 hàng + navigation [<][>].
+ */
+class YearPickerDialog(
+    context: Context,
+    private val currentYear: Int,
+    private val onYearSelected: (year: Int) -> Unit
+) : Dialog(context) {
+
+    private var baseYear: Int = 0
+    private lateinit var container: LinearLayout
+    private lateinit var tvRange: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        setContentView(R.layout.dialog_year_picker)
+
+        // Force dialog width to 90% of screen
+        window?.setLayout(
+            (context.resources.displayMetrics.widthPixels * 0.9).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        container = findViewById(R.id.gridYears)
+        tvRange = findViewById(R.id.tvYearRange)
+
+        baseYear = currentYear - (currentYear % 12)
+        renderGrid()
+
+        findViewById<ImageButton>(R.id.btnYearPrev).setOnClickListener {
+            baseYear -= 12
+            renderGrid()
+        }
+        findViewById<ImageButton>(R.id.btnYearNext).setOnClickListener {
+            baseYear += 12
+            renderGrid()
+        }
+    }
+
+    private fun renderGrid() {
+        container.removeAllViews()
+        tvRange.text = "$baseYear - ${baseYear + 11}"
+
+        val todayYear = Calendar.getInstance().get(Calendar.YEAR)
+
+        for (row in 0 until 3) {
+            val rowLayout = LinearLayout(context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+            }
+
+            for (col in 0 until 4) {
+                val index = row * 4 + col
+                val year = baseYear + index
+                val btn = createCell(year.toString())
+
+                when {
+                    year == currentYear -> applySelectedStyle(btn)
+                    year == todayYear -> applyTodayStyle(btn)
+                }
+
+                btn.setOnClickListener {
+                    onYearSelected(year)
+                    dismiss()
+                }
+
+                val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                    setMargins(dp(3), dp(4), dp(3), dp(4))
+                }
+                rowLayout.addView(btn, params)
+            }
+
+            container.addView(rowLayout)
+        }
+    }
+
+    private fun createCell(text: String): TextView {
+        return TextView(context).apply {
+            this.text = text
+            textSize = 13f
+            gravity = Gravity.CENTER
+            setPadding(dp(2), dp(12), dp(2), dp(12))
+            setTextColor(Color.parseColor("#212121"))
+            val bg = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = dp(8).toFloat()
+                setColor(Color.parseColor("#f5f5f5"))
+            }
+            background = bg
+        }
+    }
+
+    private fun applySelectedStyle(tv: TextView) {
+        val bg = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dp(8).toFloat()
+            setColor(Color.parseColor("#b22b23"))
+        }
+        tv.background = bg
+        tv.setTextColor(Color.WHITE)
+        tv.typeface = Typeface.DEFAULT_BOLD
+    }
+
+    private fun applyTodayStyle(tv: TextView) {
+        val bg = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dp(8).toFloat()
+            setColor(Color.parseColor("#f5f5f5"))
+            setStroke(dp(2), Color.parseColor("#d4a56f"))
+        }
+        tv.background = bg
+    }
+
+    private fun dp(value: Int): Int {
+        return (value * context.resources.displayMetrics.density).toInt()
+    }
+}

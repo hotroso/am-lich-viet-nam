@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- Navigation: [<] 2024 - 2035 [>] -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp">
+
+        <ImageButton
+            android:id="@+id/btnYearPrev"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/material_ic_keyboard_arrow_left_black_24dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Trước"/>
+
+        <TextView
+            android:id="@+id/tvYearRange"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorSecondary"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <ImageButton
+            android:id="@+id/btnYearNext"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/material_ic_keyboard_arrow_right_black_24dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Sau"/>
+    </LinearLayout>
+
+    <!-- Container for year buttons (built by code as 3 rows x 4 cols) -->
+    <LinearLayout
+        android:id="@+id/gridYears"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+</LinearLayout>
