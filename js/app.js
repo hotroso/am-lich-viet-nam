@@ -481,6 +481,7 @@ const App = (() => {
         if (picker.classList.contains('hidden')) {
             renderMonthPicker();
             picker.classList.remove('hidden');
+            positionPicker(picker, monthLabel);
             monthLabel.classList.add('active');
         } else {
             picker.classList.add('hidden');
@@ -522,6 +523,7 @@ const App = (() => {
             yearPickerBase = currentYear - (currentYear % 12);
             renderYearPicker();
             picker.classList.remove('hidden');
+            positionPicker(picker, yearLabel);
             yearLabel.classList.add('active');
         } else {
             picker.classList.add('hidden');
@@ -563,6 +565,11 @@ const App = (() => {
         document.getElementById('year-picker').classList.add('hidden');
         document.getElementById('month-label').classList.remove('active');
         document.getElementById('year-label').classList.remove('active');
+    }
+
+    function positionPicker(picker, anchor) {
+        const rect = anchor.getBoundingClientRect();
+        picker.style.top = (rect.bottom + 4) + 'px';
     }
 
     // ============ SIDEBAR ============
