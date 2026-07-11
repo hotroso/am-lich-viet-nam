@@ -46,22 +46,90 @@ const App = (() => {
 
     // ============ PWA INSTALL ============
     function setupInstallPrompt() {
+        // Chrome/Edge/Android - standard install prompt
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             document.getElementById('nav-install').style.display = 'block';
         });
+
+        // iOS Safari - show custom install banner
+        if (isIOSSafari() && !isStandalone()) {
+            showIOSInstallBanner();
+        }
+
+        // Show install nav item for iOS (even without beforeinstallprompt)
+        if (isIOSSafari() && !isStandalone()) {
+            document.getElementById('nav-install').style.display = 'block';
+        }
+    }
+
+    /**
+     * Detect if running in iOS Safari (not Chrome on iOS, not standalone)
+     */
+    function isIOSSafari() {
+        const ua = window.navigator.userAgent;
+        const isIOS = /iPad|iPhone|iPod/.test(ua) ||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        const isWebkit = /WebKit/.test(ua);
+        const isChrome = /CriOS/.test(ua);
+        const isFirefox = /FxiOS/.test(ua);
+        return isIOS && isWebkit && !isChrome && !isFirefox;
+    }
+
+    /**
+     * Check if app is already running as standalone (Add to Home Screen)
+     */
+    function isStandalone() {
+        return window.navigator.standalone === true ||
+            window.matchMedia('(display-mode: standalone)').matches;
+    }
+
+    /**
+     * Show iOS-specific install banner
+     */
+    function showIOSInstallBanner() {
+        // Don't show if already dismissed recently
+        const dismissed = localStorage.getItem('ios-install-dismissed');
+        if (dismissed) {
+            const dismissedAt = parseInt(dismissed);
+            // Show again after 7 days
+            if (Date.now() - dismissedAt < 7 * 24 * 60 * 60 * 1000) return;
+        }
+
+        // Show after 30 seconds of use
+        setTimeout(() => {
+            const banner = document.getElementById('ios-install-banner');
+            if (banner) {
+                banner.classList.remove('hidden');
+                document.getElementById('btn-close-ios-banner').addEventListener('click', () => {
+                    banner.classList.add('hidden');
+                    localStorage.setItem('ios-install-dismissed', String(Date.now()));
+                });
+            }
+        }, 30000);
     }
 
     async function promptInstall() {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-            showToast('Đã cài đặt ứng dụng!');
+        if (deferredPrompt) {
+            // Chrome/Android standard install
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                showToast('Đã cài đặt ứng dụng!');
+            }
+            deferredPrompt = null;
+            document.getElementById('nav-install').style.display = 'none';
+        } else if (isIOSSafari()) {
+            // iOS Safari - show install instructions
+            const banner = document.getElementById('ios-install-banner');
+            if (banner) {
+                banner.classList.remove('hidden');
+            }
+        } else {
+            // Other browsers that don't support install prompt
+            showToast('Dùng menu trình duyệt để cài đặt ứng dụng');
         }
-        deferredPrompt = null;
-        document.getElementById('nav-install').style.display = 'none';
     }
 
     // ============ EVENT LISTENERS ============
@@ -734,6 +802,12 @@ const App = (() => {
         } else if (permission === 'unsupported') {
             statusEl.className = 'notification-status denied';
             statusEl.textContent = '⚠️ Trình duyệt không hỗ trợ thông báo.';
+            btnEnable.style.display = 'none';
+        } else if (permission === 'ios-needs-homescreen') {
+            statusEl.className = 'notification-status default';
+            statusEl.innerHTML = '⚠️ Trên iOS, thông báo chỉ hoạt động khi bạn đã <strong>thêm ứng dụng vào Màn hình chính</strong>.<br><br>' +
+                '📱 Nhấn nút <span style="display:inline-block;background:#007aff;color:white;padding:1px 6px;border-radius:3px;font-size:0.8em;">⎋</span> ' +
+                'ở thanh dưới → chọn <strong>"Thêm vào MH chính"</strong>';
             btnEnable.style.display = 'none';
         } else {
             statusEl.className = 'notification-status default';

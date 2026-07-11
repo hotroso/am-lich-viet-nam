@@ -3,7 +3,7 @@
  * Handles: caching, offline, push notifications
  */
 
-const CACHE_NAME = 'amlich-v1';
+const CACHE_NAME = 'amlich-v2';
 const STATIC_ASSETS = [
     '/',
     '/index.html',
@@ -14,7 +14,10 @@ const STATIC_ASSETS = [
     '/js/notification.js',
     '/js/app.js',
     '/manifest.json',
-    '/icons/icon-192.svg'
+    '/icons/icon-192.svg',
+    '/icons/icon-192.png',
+    '/icons/icon-512.png',
+    '/icons/apple-touch-icon-180.png'
 ];
 
 // Install - cache static assets

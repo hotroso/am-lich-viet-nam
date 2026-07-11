@@ -9,29 +9,80 @@ const NotificationManager = (() => {
 
     /**
      * Check if notifications are supported.
+     * Safari iOS chỉ hỗ trợ Web Push từ iOS 16.4+ và khi đã Add to Home Screen.
      */
     function isSupported() {
-        return 'Notification' in window && 'serviceWorker' in navigator;
+        // Check basic support
+        if (!('Notification' in window)) return false;
+        if (!('serviceWorker' in navigator)) return false;
+
+        // On iOS Safari, notifications only work in standalone mode (Add to Home Screen)
+        // and only on iOS 16.4+
+        if (isIOSSafari() && !isStandaloneMode()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Detect iOS Safari
+     */
+    function isIOSSafari() {
+        const ua = window.navigator.userAgent;
+        const isIOS = /iPad|iPhone|iPod/.test(ua) ||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        return isIOS;
+    }
+
+    /**
+     * Check if running as standalone PWA (Add to Home Screen)
+     */
+    function isStandaloneMode() {
+        return window.navigator.standalone === true ||
+            window.matchMedia('(display-mode: standalone)').matches;
     }
 
     /**
      * Get current permission status.
+     * Returns special status for iOS Safari conditions.
      */
     function getPermission() {
-        if (!isSupported()) return 'unsupported';
+        if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+            return 'unsupported';
+        }
+
+        // iOS Safari but not standalone - needs Add to Home Screen first
+        if (isIOSSafari() && !isStandaloneMode()) {
+            return 'ios-needs-homescreen';
+        }
+
         return Notification.permission; // 'granted', 'denied', 'default'
     }
 
     /**
      * Request notification permission.
+     * On iOS Safari, must be called from a user gesture in standalone mode.
      */
     async function requestPermission() {
-        if (!isSupported()) return 'unsupported';
-        const result = await Notification.requestPermission();
-        if (result === 'granted') {
-            startDailyCheck();
+        if (!('Notification' in window)) return 'unsupported';
+
+        // iOS not in standalone mode
+        if (isIOSSafari() && !isStandaloneMode()) {
+            return 'ios-needs-homescreen';
         }
-        return result;
+
+        try {
+            const result = await Notification.requestPermission();
+            if (result === 'granted') {
+                startDailyCheck();
+            }
+            return result;
+        } catch (e) {
+            // Safari older versions may throw on Notification.requestPermission
+            console.warn('Notification permission request failed:', e);
+            return 'unsupported';
+        }
     }
 
     /**
@@ -195,17 +246,21 @@ const NotificationManager = (() => {
 
     /**
      * Register periodic sync (if supported).
+     * Safari/iOS does NOT support Periodic Background Sync.
+     * Falls back to setInterval (already handled in startDailyCheck).
      */
     async function registerPeriodicSync() {
-        if ('periodicSync' in (await navigator.serviceWorker.ready)) {
-            try {
-                await (await navigator.serviceWorker.ready).periodicSync.register('check-events', {
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            if ('periodicSync' in registration) {
+                await registration.periodicSync.register('check-events', {
                     minInterval: 12 * 60 * 60 * 1000 // 12 hours
                 });
-            } catch (e) {
-                // Periodic sync not available, rely on setInterval
-                console.log('Periodic sync not available, using interval fallback');
             }
+        } catch (e) {
+            // Periodic sync not available (Safari, Firefox, etc.)
+            // Rely on setInterval fallback in startDailyCheck
+            console.log('Periodic sync not available, using interval fallback');
         }
     }
 

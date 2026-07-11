@@ -236,12 +236,16 @@ fi
 # === BƯỚC 9: CÀI ĐẶT AUTO-RENEW SSL ===
 log_info "Bước 9: Kiểm tra auto-renew SSL..."
 
-if systemctl is-active --quiet certbot.timer; then
+if systemctl is-active --quiet certbot.timer 2>/dev/null; then
     log_info "Certbot timer đã active - SSL sẽ tự gia hạn."
+elif crontab -l 2>/dev/null | grep -q certbot || [ -f /etc/cron.d/certbot ]; then
+    log_info "Certbot cron job đã tồn tại - SSL sẽ tự gia hạn."
 else
-    systemctl enable certbot.timer
-    systemctl start certbot.timer
-    log_info "Đã bật certbot timer cho auto-renew."
+    # Thêm cron job renew 2 lần/ngày
+    log_info "Tạo cron job auto-renew SSL..."
+    echo "0 0,12 * * * root certbot renew --quiet --deploy-hook 'systemctl reload apache2'" > /etc/cron.d/certbot-amlich
+    chmod 644 /etc/cron.d/certbot-amlich
+    log_info "Đã tạo cron job auto-renew tại /etc/cron.d/certbot-amlich"
 fi
 
 # === HOÀN TẤT ===

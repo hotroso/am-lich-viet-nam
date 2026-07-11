@@ -906,6 +906,101 @@ hr {
     margin: 16px 0;
 }
 
+/* === iOS Install Banner === */
+.ios-install-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 500;
+    padding: 12px 16px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    background: var(--surface);
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.15);
+    border-radius: 16px 16px 0 0;
+    animation: slideUp 0.3s ease;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.ios-install-banner.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(100%);
+}
+
+.ios-install-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+}
+
+.ios-install-close {
+    position: absolute;
+    top: -4px;
+    right: 0;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+.ios-install-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.ios-install-text {
+    flex: 1;
+}
+
+.ios-install-text strong {
+    font-size: 0.95rem;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.ios-install-text p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.ios-share-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    background: #007aff;
+    color: white;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    vertical-align: middle;
+}
+
+/* === Safari-specific fixes === */
+@supports (-webkit-touch-callout: none) {
+    /* iOS Safari specific - fix 100vh issue */
+    body {
+        min-height: -webkit-fill-available;
+    }
+
+    /* Fix sticky header on iOS */
+    .app-header {
+        position: -webkit-sticky;
+    }
+
+    /* Fix smooth scrolling on iOS */
+    .modal-content,
+    .event-list-container,
+    .upcoming-list {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
 /* === Media queries === */
 @media (min-width: 600px) {
     .calendar-cell {

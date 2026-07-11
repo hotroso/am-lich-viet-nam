@@ -8,9 +8,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Âm Lịch VN">
+    <meta name="mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="icons/icon-192.svg">
-    <link rel="apple-touch-icon" href="icons/icon-192.svg">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon-180.png">
     <title>Âm Lịch Việt Nam</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -281,6 +284,18 @@
 
         <!-- Toast -->
         <div id="toast" class="toast hidden"></div>
+
+        <!-- iOS Install Banner -->
+        <div id="ios-install-banner" class="ios-install-banner hidden">
+            <div class="ios-install-content">
+                <button id="btn-close-ios-banner" class="ios-install-close" aria-label="Đóng">✕</button>
+                <div class="ios-install-icon">📲</div>
+                <div class="ios-install-text">
+                    <strong>Cài đặt Âm Lịch VN</strong>
+                    <p>Nhấn <span class="ios-share-icon">⎋</span> rồi chọn <strong>"Thêm vào MH chính"</strong></p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="js/lunar-calendar.js"></script>
