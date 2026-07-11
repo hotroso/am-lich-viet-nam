@@ -924,6 +924,90 @@ body {
 
 .note { font-size: 0.8rem; color: var(--text-secondary); margin-top: 12px; }
 
+/* === Remind Multi-Select === */
+.remind-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+    min-height: 28px;
+}
+
+.remind-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: #e3f2fd;
+    color: #1565c0;
+    border-radius: 14px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.remind-tag .remove-remind {
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: #1565c0;
+    padding: 0 2px;
+    line-height: 1;
+}
+
+.remind-tag .remove-remind:hover {
+    color: #d32f2f;
+}
+
+.remind-add-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.remind-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    max-width: 120px;
+}
+
+.btn-add-remind {
+    padding: 8px 14px;
+    background: var(--secondary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.remind-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.remind-preset {
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font);
+    color: var(--text-secondary);
+}
+
+.remind-preset:hover {
+    background: #f0f0f0;
+    border-color: var(--accent);
+}
+
 /* === About Modal === */
 .about-body {
     text-align: center;

@@ -121,64 +121,64 @@ const NotificationManager = (() => {
         const currentMinute = now.getMinutes();
 
         for (const evt of events) {
-            // Calculate target solar date for this event
-            let targetLunarDay = evt.lunarDay;
-            let targetLunarMonth = evt.lunarMonth;
-            let shouldNotify = false;
+            // Get reminder days array (backward compatible)
+            const reminderDays = (evt.reminders && Array.isArray(evt.reminders))
+                ? evt.reminders
+                : [evt.remindDaysBefore || 0];
 
-            // Check if today matches (considering remindDaysBefore)
-            if (evt.remindDaysBefore && evt.remindDaysBefore > 0) {
-                // Calculate the actual event date in solar
-                const eventSolar = VietCalendar.lunarToSolar(
-                    evt.lunarDay, evt.lunarMonth,
-                    evt.lunarYear || lunar.year, 0
-                );
-                const eventDate = new Date(eventSolar.year, eventSolar.month - 1, eventSolar.day);
-                const reminderDate = new Date(eventDate);
-                reminderDate.setDate(reminderDate.getDate() - evt.remindDaysBefore);
+            for (const daysBefore of reminderDays) {
+                let shouldNotify = false;
 
-                if (reminderDate.getDate() === today.day &&
-                    reminderDate.getMonth() + 1 === today.month &&
-                    reminderDate.getFullYear() === today.year) {
-                    shouldNotify = true;
+                if (daysBefore > 0) {
+                    // Calculate the actual event date in solar
+                    const eventSolar = VietCalendar.lunarToSolar(
+                        evt.lunarDay, evt.lunarMonth,
+                        evt.lunarYear || lunar.year, 0
+                    );
+                    const eventDate = new Date(eventSolar.year, eventSolar.month - 1, eventSolar.day);
+                    const reminderDate = new Date(eventDate);
+                    reminderDate.setDate(reminderDate.getDate() - daysBefore);
+
+                    if (reminderDate.getDate() === today.day &&
+                        reminderDate.getMonth() + 1 === today.month &&
+                        reminderDate.getFullYear() === today.year) {
+                        shouldNotify = true;
+                    }
+                } else {
+                    // daysBefore === 0: notify on the event day itself
+                    if (evt.repeat === 'MONTHLY' && lunar.day === evt.lunarDay) {
+                        shouldNotify = true;
+                    } else if (evt.repeat === 'YEARLY' && lunar.day === evt.lunarDay && lunar.month === evt.lunarMonth) {
+                        shouldNotify = true;
+                    } else if (evt.repeat === 'ONCE' && lunar.day === evt.lunarDay &&
+                               lunar.month === evt.lunarMonth && lunar.year === (evt.lunarYear || lunar.year)) {
+                        shouldNotify = true;
+                    }
                 }
-            } else {
-                // Direct match
-                if (evt.repeat === 'MONTHLY' && lunar.day === evt.lunarDay) {
-                    shouldNotify = true;
-                } else if (evt.repeat === 'YEARLY' && lunar.day === evt.lunarDay && lunar.month === evt.lunarMonth) {
-                    shouldNotify = true;
-                } else if (evt.repeat === 'ONCE' && lunar.day === evt.lunarDay &&
-                           lunar.month === evt.lunarMonth && lunar.year === (evt.lunarYear || lunar.year)) {
-                    shouldNotify = true;
-                }
-            }
 
-            if (shouldNotify) {
-                const remindHour = evt.remindHour || 7;
-                const remindMinute = evt.remindMinute || 0;
+                if (shouldNotify) {
+                    const remindHour = evt.remindHour || 7;
+                    const remindMinute = evt.remindMinute || 0;
 
-                // Check if it's time to notify
-                // Match exact hour and within 5-minute window of the target minute
-                // OR if we missed it (app was suspended), fire if we're past the time but same hour
-                const isExactTime = currentHour === remindHour && currentMinute >= remindMinute && currentMinute <= remindMinute + 5;
-                // Also handle case where app was suspended and resumed after target time (same day)
-                const isPastTime = (currentHour > remindHour) || (currentHour === remindHour && currentMinute > remindMinute + 5);
+                    const isExactTime = currentHour === remindHour && currentMinute >= remindMinute && currentMinute <= remindMinute + 5;
+                    const isPastTime = (currentHour > remindHour) || (currentHour === remindHour && currentMinute > remindMinute + 5);
 
-                if (isExactTime || isPastTime) {
-                    // Check if already notified today
-                    const notifiedKey = `notified_${evt.id}_${today.day}_${today.month}_${today.year}`;
-                    if (!localStorage.getItem(notifiedKey)) {
-                        const jdn = VietCalendar.jdFromDate(today.day, today.month, today.year);
-                        const gioHoangDao = CanChi.getGioHoangDao(jdn);
+                    if (isExactTime || isPastTime) {
+                        // Unique key per event + daysBefore to allow multiple notifications
+                        const notifiedKey = `notified_${evt.id}_${daysBefore}_${today.day}_${today.month}_${today.year}`;
+                        if (!localStorage.getItem(notifiedKey)) {
+                            const jdn = VietCalendar.jdFromDate(today.day, today.month, today.year);
+                            const gioHoangDao = CanChi.getGioHoangDao(jdn);
 
-                        const body = buildNotificationBody(evt, lunar, gioHoangDao);
-                        await showNotification(
-                            `📅 ${evt.title}`,
-                            body,
-                            { tag: `event-${evt.id}`, eventId: evt.id }
-                        );
-                        localStorage.setItem(notifiedKey, '1');
+                            const prefix = daysBefore > 0 ? `⏰ Còn ${daysBefore} ngày: ` : '📅 ';
+                            const body = buildNotificationBody(evt, lunar, gioHoangDao, daysBefore);
+                            await showNotification(
+                                `${prefix}${evt.title}`,
+                                body,
+                                { tag: `event-${evt.id}-${daysBefore}`, eventId: evt.id }
+                            );
+                            localStorage.setItem(notifiedKey, '1');
+                        }
                     }
                 }
             }
@@ -191,12 +191,15 @@ const NotificationManager = (() => {
     /**
      * Build notification body text.
      */
-    function buildNotificationBody(evt, lunar, gioHoangDao) {
+    function buildNotificationBody(evt, lunar, gioHoangDao, daysBefore) {
         const parts = [];
+        if (daysBefore > 0) {
+            parts.push(`Sự kiện sẽ diễn ra sau ${daysBefore} ngày nữa`);
+        }
         parts.push(`Ngày ${lunar.day} tháng ${lunar.month} âm lịch`);
         if (gioHoangDao) {
             const firstGio = gioHoangDao.split(',')[0];
-            parts.push(`Giờ tốt tiếp theo: ${firstGio}`);
+            parts.push(`Giờ tốt: ${firstGio}`);
         }
         if (evt.note) {
             parts.push(evt.note);

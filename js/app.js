@@ -171,6 +171,9 @@ const App = (() => {
         // Chip groups
         setupChipGroups();
 
+        // Remind multi-select
+        setupRemindListeners();
+
         // Convert inputs
         ['convert-solar-day', 'convert-solar-month', 'convert-solar-year'].forEach(id => {
             document.getElementById(id).addEventListener('input', handleSolarToLunar);
@@ -597,6 +600,51 @@ const App = (() => {
     }
 
     // ============ EVENT MANAGEMENT ============
+    let currentReminders = []; // Array of days-before values
+
+    function renderRemindList() {
+        const container = document.getElementById('remind-list');
+        container.innerHTML = '';
+        currentReminders.sort((a, b) => b - a).forEach(days => {
+            const tag = document.createElement('span');
+            tag.className = 'remind-tag';
+            tag.innerHTML = `${days === 0 ? 'Đúng ngày' : days + ' ngày trước'}<button class="remove-remind" data-days="${days}">✕</button>`;
+            tag.querySelector('.remove-remind').addEventListener('click', () => {
+                currentReminders = currentReminders.filter(d => d !== days);
+                renderRemindList();
+            });
+            container.appendChild(tag);
+        });
+    }
+
+    function addReminder(days) {
+        days = parseInt(days);
+        if (isNaN(days) || days < 0 || days > 90) return;
+        if (!currentReminders.includes(days)) {
+            currentReminders.push(days);
+            renderRemindList();
+        }
+    }
+
+    function setupRemindListeners() {
+        document.getElementById('btn-add-remind').addEventListener('click', () => {
+            const input = document.getElementById('remind-custom-days');
+            addReminder(input.value);
+            input.value = '';
+        });
+        document.getElementById('remind-custom-days').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const input = document.getElementById('remind-custom-days');
+                addReminder(input.value);
+                input.value = '';
+            }
+        });
+        document.querySelectorAll('.remind-preset').forEach(btn => {
+            btn.addEventListener('click', () => addReminder(btn.dataset.days));
+        });
+    }
+
     function openAddEvent() {
         editingEventId = null;
         document.getElementById('modal-event-title').textContent = 'Thêm sự kiện';
@@ -613,7 +661,11 @@ const App = (() => {
         document.querySelectorAll('.chip-group .chip').forEach(c => c.classList.remove('active'));
         document.querySelector('#event-type-group [data-value="GIO"]').classList.add('active');
         document.querySelector('#event-repeat-group [data-value="YEARLY"]').classList.add('active');
-        document.querySelector('#event-remind-group [data-value="0"]').classList.add('active');
+
+        // Default: nhắc đúng ngày
+        currentReminders = [0];
+        renderRemindList();
+
         toggleModal('modal-event', true);
     }
 
@@ -633,7 +685,15 @@ const App = (() => {
 
         setChipValue('event-type-group', evt.eventType || 'KHAC');
         setChipValue('event-repeat-group', evt.repeat || 'YEARLY');
-        setChipValue('event-remind-group', String(evt.remindDaysBefore || 0));
+
+        // Load reminders (backward compatible: old single value → array)
+        if (evt.reminders && Array.isArray(evt.reminders)) {
+            currentReminders = [...evt.reminders];
+        } else {
+            currentReminders = [evt.remindDaysBefore || 0];
+        }
+        renderRemindList();
+
         toggleModal('modal-event', true);
     }
 
@@ -662,7 +722,8 @@ const App = (() => {
             lunarYear: parseInt(document.getElementById('event-lunar-year').value) || 0,
             eventType: getChipValue('event-type-group') || 'KHAC',
             repeat: getChipValue('event-repeat-group') || 'YEARLY',
-            remindDaysBefore: parseInt(getChipValue('event-remind-group')) || 0,
+            reminders: currentReminders.length > 0 ? [...currentReminders] : [0],
+            remindDaysBefore: currentReminders.length > 0 ? Math.min(...currentReminders) : 0, // backward compat
             remindHour: parseInt(time[0]) || 7,
             remindMinute: parseInt(time[1]) || 0,
             isEnabled: true
