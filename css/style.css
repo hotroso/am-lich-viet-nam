@@ -977,20 +977,23 @@ body {
 
 .remind-add-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 6px;
     margin-bottom: 8px;
 }
 
 .remind-input {
-    width: 70px;
-    padding: 8px 10px;
+    width: 60px;
+    padding: 8px 8px;
     border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 0.85rem;
+    text-align: center;
 }
 
 .remind-note-input {
     flex: 1;
+    min-width: 0;
     padding: 8px 10px;
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -1006,6 +1009,7 @@ body {
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .remind-presets {
