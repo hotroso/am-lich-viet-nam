@@ -4,8 +4,8 @@
   "description": "Xem ngày âm lịch, Can Chi, Giờ Hoàng Đạo, Tiết Khí, quản lý sự kiện âm lịch",
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#b71c1c",
+  "background_color": "#f8f8f0",
+  "theme_color": "#ffffce",
   "orientation": "portrait-primary",
   "lang": "vi",
   "icons": [

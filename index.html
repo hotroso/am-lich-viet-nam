@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#b71c1c">
+    <meta name="theme-color" content="#ffffce">
     <meta name="description" content="Âm Lịch Việt Nam - Xem ngày âm lịch, Can Chi, Giờ Hoàng Đạo, Tiết Khí">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Âm Lịch VN">
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="manifest" href="manifest.json">
@@ -19,134 +19,121 @@
 </head>
 <body>
     <div id="app">
-        <!-- Header -->
-        <header class="app-header">
-            <button id="btn-prev-month" class="nav-btn" aria-label="Tháng trước">&#10094;</button>
-            <div class="header-title-group">
-                <span id="header-month" class="header-month" title="Chọn tháng"></span>
-                <span id="header-year" class="header-year" title="Chọn năm"></span>
-            </div>
-            <button id="btn-next-month" class="nav-btn" aria-label="Tháng sau">&#10095;</button>
-            <button id="btn-today" class="btn-today" title="Về hôm nay">⦿</button>
-            <button id="btn-menu" class="btn-menu" aria-label="Menu">☰</button>
+        <!-- Top Navigation Bar -->
+        <header class="top-nav">
+            <button id="btn-menu" class="nav-icon-btn" aria-label="Menu">☰</button>
+            <span id="header-title" class="nav-title"></span>
+            <button id="btn-today" class="nav-icon-btn" title="Về hôm nay">📅</button>
         </header>
 
-        <!-- Month Picker Dropdown -->
-        <div id="month-picker" class="picker-dropdown hidden">
-            <div class="picker-grid picker-month-grid" id="month-picker-grid"></div>
-        </div>
-
-        <!-- Year Picker Dropdown -->
-        <div id="year-picker" class="picker-dropdown hidden">
-            <div class="picker-year-nav">
-                <button id="btn-year-prev" class="picker-nav-btn">&#10094;</button>
-                <span id="year-picker-range" class="picker-range-label"></span>
-                <button id="btn-year-next" class="picker-nav-btn">&#10095;</button>
+        <!-- Main Content: Day Info -->
+        <section class="day-info-section" id="day-info-section">
+            <!-- Big Day Number -->
+            <div class="big-day-row">
+                <span id="info-big-day" class="big-day-number"></span>
+                <button id="btn-day-detail" class="btn-info-circle" title="Xem chi tiết">ⓘ</button>
             </div>
-            <div class="picker-grid picker-year-grid" id="year-picker-grid"></div>
-        </div>
+            <div id="info-weekday" class="day-of-week"></div>
 
-        <!-- Calendar Grid -->
-        <section class="calendar-section">
+            <!-- Lunar Info: 2 columns -->
+            <div class="lunar-two-col">
+                <!-- Left: Lunar date -->
+                <div class="lunar-left">
+                    <div id="info-lunar-month" class="lunar-month-label"></div>
+                    <div id="info-lunar-day" class="lunar-day-big"></div>
+                    <div id="info-lunar-year" class="lunar-year-label"></div>
+                    <div id="info-clock" class="digital-clock"></div>
+                </div>
+                <!-- Right: Can Chi info -->
+                <div class="lunar-right">
+                    <div id="info-canchi-thang" class="canchi-line"></div>
+                    <div id="info-canchi-ngay" class="canchi-line"></div>
+                    <div id="info-canchi-gio" class="canchi-line"></div>
+                    <div id="info-tiet-khi" class="canchi-line tiet-khi"></div>
+                </div>
+            </div>
+
+            <!-- Event -->
+            <div id="info-events" class="event-text" style="display:none"></div>
+
+            <!-- Giờ Hoàng Đạo -->
+            <div id="info-gio-hoang-dao" class="gio-hoang-dao"></div>
+
+            <!-- Day Rating Badge -->
+            <div id="info-day-rating" class="day-rating-badge"></div>
+        </section>
+
+        <!-- Bottom Sheet: Calendar -->
+        <section class="calendar-sheet" id="calendar-sheet">
+            <!-- Drag Handle -->
+            <div class="sheet-handle"><div class="handle-bar"></div></div>
+
+            <!-- Month Navigation -->
+            <div class="month-nav">
+                <button id="btn-prev-month" class="month-nav-btn" aria-label="Tháng trước">&#10094;</button>
+                <div class="month-nav-center">
+                    <span id="month-label" class="month-label"></span>
+                    <span class="month-sep">, </span>
+                    <span id="year-label" class="year-label"></span>
+                </div>
+                <button id="btn-next-month" class="month-nav-btn" aria-label="Tháng sau">&#10095;</button>
+            </div>
+
+            <!-- Weekday Header -->
             <div class="weekday-header">
-                <span class="weekday sun">CN</span>
-                <span class="weekday">T2</span>
-                <span class="weekday">T3</span>
-                <span class="weekday">T4</span>
-                <span class="weekday">T5</span>
-                <span class="weekday">T6</span>
-                <span class="weekday sat">T7</span>
+                <span class="wd">T2</span>
+                <span class="wd">T3</span>
+                <span class="wd">T4</span>
+                <span class="wd">T5</span>
+                <span class="wd">T6</span>
+                <span class="wd sat">T7</span>
+                <span class="wd sun">CN</span>
             </div>
+
+            <!-- Calendar Grid -->
             <div id="calendar-grid" class="calendar-grid"></div>
         </section>
 
-        <!-- Day Info Panel -->
-        <section id="day-info" class="day-info">
-            <div class="day-info-header">
-                <div class="solar-date">
-                    <span id="info-weekday" class="info-weekday"></span>
-                    <span id="info-solar-day" class="info-solar-day"></span>
-                    <span id="info-solar-month-year" class="info-solar-month-year"></span>
-                </div>
-                <div id="info-rating-badge" class="rating-badge"></div>
-            </div>
-            <div class="lunar-info">
-                <div class="lunar-date-row">
-                    <span class="label">Âm lịch:</span>
-                    <span id="info-lunar-date" class="value"></span>
-                </div>
-                <div class="canchi-row">
-                    <span class="label">Ngày:</span>
-                    <span id="info-canchi-ngay" class="value canchi"></span>
-                </div>
-                <div class="canchi-row">
-                    <span class="label">Tháng:</span>
-                    <span id="info-canchi-thang" class="value canchi"></span>
-                </div>
-                <div class="canchi-row">
-                    <span class="label">Năm:</span>
-                    <span id="info-canchi-nam" class="value canchi"></span>
-                </div>
-                <div class="canchi-row">
-                    <span class="label">Tiết khí:</span>
-                    <span id="info-tiet-khi" class="value highlight"></span>
-                </div>
-                <div class="canchi-row">
-                    <span class="label">Giờ hoàng đạo:</span>
-                    <span id="info-gio-hoang-dao" class="value"></span>
-                </div>
-                <div class="canchi-row">
-                    <span class="label">Trực:</span>
-                    <span id="info-truc" class="value"></span>
-                </div>
-                <div class="canchi-row">
-                    <span class="label">Ngũ hành:</span>
-                    <span id="info-ngu-hanh" class="value"></span>
-                </div>
-                <div class="canchi-row">
-                    <span class="label">Hoàng/Hắc đạo:</span>
-                    <span id="info-hoang-dao" class="value"></span>
-                </div>
-            </div>
-            <div id="day-advice" class="day-advice">
-                <div class="advice-section nen-lam">
-                    <h4>✅ Nên làm</h4>
-                    <div id="info-nen-lam" class="advice-tags"></div>
-                </div>
-                <div class="advice-section khong-nen">
-                    <h4>❌ Không nên</h4>
-                    <div id="info-khong-nen" class="advice-tags"></div>
-                </div>
-            </div>
-            <div id="day-events" class="day-events" style="display:none">
-                <h4>📅 Sự kiện</h4>
-                <div id="info-events-list" class="events-list"></div>
-            </div>
-        </section>
-
-        <!-- Sidebar / Menu -->
+        <!-- Sidebar (Drawer from left) -->
         <div id="sidebar-overlay" class="sidebar-overlay hidden"></div>
         <aside id="sidebar" class="sidebar hidden">
-            <div class="sidebar-header">
-                <h2>Âm Lịch Việt Nam</h2>
-                <button id="btn-close-sidebar" class="btn-close" aria-label="Đóng">✕</button>
+            <div class="sidebar-banner">
+                <div class="banner-icon">🌙</div>
+                <div class="banner-title">Âm Lịch Việt Nam</div>
             </div>
-            <nav class="sidebar-nav">
-                <a href="#" id="nav-events" class="nav-item">📋 Sự kiện âm lịch</a>
-                <a href="#" id="nav-convert" class="nav-item">🔄 Chuyển đổi ngày</a>
-                <a href="#" id="nav-upcoming" class="nav-item">📆 Sự kiện sắp tới</a>
-                <a href="#" id="nav-notification" class="nav-item">🔔 Cài đặt thông báo</a>
-                <a href="#" id="nav-install" class="nav-item" style="display:none">📲 Cài đặt ứng dụng</a>
-                <a href="#" id="nav-about" class="nav-item">ℹ️ Giới thiệu</a>
+            <nav class="sidebar-menu">
+                <a href="#" id="nav-events" class="menu-item">📅 Sự kiện âm lịch</a>
+                <div class="menu-divider"></div>
+                <a href="#" id="nav-upcoming" class="menu-item">📈 Sắp tới</a>
+                <div class="menu-divider"></div>
+                <a href="#" id="nav-convert" class="menu-item">🔄 Dương lịch ⇄ Âm lịch</a>
+                <div class="menu-divider"></div>
+                <a href="#" id="nav-notification" class="menu-item">🔔 Thông báo</a>
+                <div class="menu-divider"></div>
+                <a href="#" id="nav-install" class="menu-item" style="display:none">📲 Cài đặt ứng dụng</a>
+                <a href="#" id="nav-about" class="menu-item">ℹ️ Thông tin</a>
             </nav>
         </aside>
+
+        <!-- Modal: Date Detail -->
+        <div id="modal-detail" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="btn-close" id="btn-close-detail">✕</button>
+                    <span class="modal-title">Thông tin</span>
+                    <button class="btn-share" id="btn-share-detail">↗</button>
+                </div>
+                <div class="modal-body" id="detail-body"></div>
+            </div>
+        </div>
 
         <!-- Modal: Add/Edit Event -->
         <div id="modal-event" class="modal hidden">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 id="modal-event-title">Thêm sự kiện</h3>
                     <button class="btn-close" id="btn-close-event-modal">✕</button>
+                    <span class="modal-title" id="modal-event-title">Thêm sự kiện</span>
+                    <span></span>
                 </div>
                 <form id="form-event" class="form-event">
                     <div class="form-group">
@@ -167,7 +154,7 @@
                             <input type="number" id="event-lunar-month" min="1" max="12" required>
                         </div>
                         <div class="form-group">
-                            <label for="event-lunar-year">Năm âm (0=mọi năm)</label>
+                            <label for="event-lunar-year">Năm (0=mọi năm)</label>
                             <input type="number" id="event-lunar-year" min="0" value="0">
                         </div>
                     </div>
@@ -211,10 +198,11 @@
 
         <!-- Modal: Event List -->
         <div id="modal-event-list" class="modal hidden">
-            <div class="modal-content modal-large">
+            <div class="modal-content modal-full">
                 <div class="modal-header">
-                    <h3>Sự kiện âm lịch</h3>
                     <button class="btn-close" id="btn-close-event-list">✕</button>
+                    <span class="modal-title">Sự kiện âm lịch</span>
+                    <span></span>
                 </div>
                 <div class="modal-body">
                     <div id="event-list-container" class="event-list-container"></div>
@@ -227,8 +215,9 @@
         <div id="modal-convert" class="modal hidden">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Chuyển đổi ngày</h3>
                     <button class="btn-close" id="btn-close-convert">✕</button>
+                    <span class="modal-title">Chuyển đổi ngày</span>
+                    <span></span>
                 </div>
                 <div class="modal-body">
                     <div class="convert-section">
@@ -256,10 +245,11 @@
 
         <!-- Modal: Upcoming Events -->
         <div id="modal-upcoming" class="modal hidden">
-            <div class="modal-content modal-large">
+            <div class="modal-content modal-full">
                 <div class="modal-header">
-                    <h3>Sự kiện sắp tới (90 ngày)</h3>
                     <button class="btn-close" id="btn-close-upcoming">✕</button>
+                    <span class="modal-title">Sắp tới (90 ngày)</span>
+                    <span></span>
                 </div>
                 <div class="modal-body">
                     <div id="upcoming-list" class="upcoming-list"></div>
@@ -271,8 +261,9 @@
         <div id="modal-notification" class="modal hidden">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>🔔 Cài đặt thông báo</h3>
                     <button class="btn-close" id="btn-close-notification">✕</button>
+                    <span class="modal-title">🔔 Thông báo</span>
+                    <span></span>
                 </div>
                 <div class="modal-body">
                     <div id="notification-status" class="notification-status"></div>

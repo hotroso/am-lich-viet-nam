@@ -1,5 +1,6 @@
 /**
  * Main App Controller - Âm Lịch Việt Nam PWA
+ * Layout matching Android app design
  */
 
 const App = (() => {
@@ -7,12 +8,12 @@ const App = (() => {
     let currentYear, currentMonth; // Solar month being viewed
     let selectedDate = null; // { day, month, year }
     let editingEventId = null;
-    let deferredPrompt = null; // PWA install prompt
-    let allUserEvents = []; // Cache
-    let yearPickerBase = 0; // Base year for year picker grid
+    let deferredPrompt = null;
+    let allUserEvents = [];
+    let clockInterval = null;
 
-    const WEEKDAYS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-    const MONTHS = ['', 'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+    const WEEKDAYS = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
+    const MONTHS_SHORT = ['', 'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
                     'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
 
     // ============ INIT ============
@@ -30,6 +31,7 @@ const App = (() => {
         });
         NotificationManager.init();
         setupInstallPrompt();
+        startClock();
     }
 
     // ============ SERVICE WORKER ============
@@ -44,60 +46,46 @@ const App = (() => {
         }
     }
 
+    // ============ CLOCK ============
+    function startClock() {
+        updateClock();
+        clockInterval = setInterval(updateClock, 1000);
+    }
+
+    function updateClock() {
+        const el = document.getElementById('info-clock');
+        if (el) {
+            const now = new Date();
+            el.textContent = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+    }
+
     // ============ PWA INSTALL ============
     function setupInstallPrompt() {
-        // Chrome/Edge/Android - standard install prompt
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             document.getElementById('nav-install').style.display = 'block';
         });
-
-        // iOS Safari - show custom install banner
-        if (isIOSSafari() && !isStandalone()) {
-            showIOSInstallBanner();
-        }
-
-        // Show install nav item for iOS (even without beforeinstallprompt)
         if (isIOSSafari() && !isStandalone()) {
             document.getElementById('nav-install').style.display = 'block';
+            showIOSInstallBanner();
         }
     }
 
-    /**
-     * Detect if running in iOS Safari (not Chrome on iOS, not standalone)
-     */
     function isIOSSafari() {
         const ua = window.navigator.userAgent;
-        const isIOS = /iPad|iPhone|iPod/.test(ua) ||
-            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        const isWebkit = /WebKit/.test(ua);
-        const isChrome = /CriOS/.test(ua);
-        const isFirefox = /FxiOS/.test(ua);
-        return isIOS && isWebkit && !isChrome && !isFirefox;
+        const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        return isIOS && /WebKit/.test(ua) && !/CriOS/.test(ua) && !/FxiOS/.test(ua);
     }
 
-    /**
-     * Check if app is already running as standalone (Add to Home Screen)
-     */
     function isStandalone() {
-        return window.navigator.standalone === true ||
-            window.matchMedia('(display-mode: standalone)').matches;
+        return window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
     }
 
-    /**
-     * Show iOS-specific install banner
-     */
     function showIOSInstallBanner() {
-        // Don't show if already dismissed recently
         const dismissed = localStorage.getItem('ios-install-dismissed');
-        if (dismissed) {
-            const dismissedAt = parseInt(dismissed);
-            // Show again after 7 days
-            if (Date.now() - dismissedAt < 7 * 24 * 60 * 60 * 1000) return;
-        }
-
-        // Show after 30 seconds of use
+        if (dismissed && Date.now() - parseInt(dismissed) < 7 * 24 * 60 * 60 * 1000) return;
         setTimeout(() => {
             const banner = document.getElementById('ios-install-banner');
             if (banner) {
@@ -112,22 +100,14 @@ const App = (() => {
 
     async function promptInstall() {
         if (deferredPrompt) {
-            // Chrome/Android standard install
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                showToast('Đã cài đặt ứng dụng!');
-            }
+            if (outcome === 'accepted') showToast('Đã cài đặt ứng dụng!');
             deferredPrompt = null;
             document.getElementById('nav-install').style.display = 'none';
         } else if (isIOSSafari()) {
-            // iOS Safari - show install instructions
-            const banner = document.getElementById('ios-install-banner');
-            if (banner) {
-                banner.classList.remove('hidden');
-            }
+            document.getElementById('ios-install-banner').classList.remove('hidden');
         } else {
-            // Other browsers that don't support install prompt
             showToast('Dùng menu trình duyệt để cài đặt ứng dụng');
         }
     }
@@ -139,31 +119,12 @@ const App = (() => {
         document.getElementById('btn-next-month').addEventListener('click', () => navigateMonth(1));
         document.getElementById('btn-today').addEventListener('click', goToToday);
         document.getElementById('btn-menu').addEventListener('click', openSidebar);
-        document.getElementById('btn-close-sidebar').addEventListener('click', closeSidebar);
         document.getElementById('sidebar-overlay').addEventListener('click', closeSidebar);
+        document.getElementById('btn-day-detail').addEventListener('click', showDateDetail);
+        document.getElementById('info-day-rating').addEventListener('click', showDateDetail);
 
-        // Month/Year pickers
-        document.getElementById('header-month').addEventListener('click', toggleMonthPicker);
-        document.getElementById('header-year').addEventListener('click', toggleYearPicker);
-        document.getElementById('btn-year-prev').addEventListener('click', () => navigateYearPicker(-12));
-        document.getElementById('btn-year-next').addEventListener('click', () => navigateYearPicker(12));
-
-        // Close pickers when clicking outside
-        document.addEventListener('click', (e) => {
-            const monthPicker = document.getElementById('month-picker');
-            const yearPicker = document.getElementById('year-picker');
-            const headerMonth = document.getElementById('header-month');
-            const headerYear = document.getElementById('header-year');
-            if (!monthPicker.contains(e.target) && e.target !== headerMonth) {
-                monthPicker.classList.add('hidden');
-                headerMonth.classList.remove('active');
-            }
-            if (!yearPicker.contains(e.target) && e.target !== headerYear &&
-                !e.target.closest('.picker-year-nav')) {
-                yearPicker.classList.add('hidden');
-                headerYear.classList.remove('active');
-            }
-        });
+        // Year label click
+        document.getElementById('year-label').addEventListener('click', showYearPicker);
 
         // Sidebar nav
         document.getElementById('nav-events').addEventListener('click', (e) => { e.preventDefault(); closeSidebar(); openEventList(); });
@@ -174,11 +135,13 @@ const App = (() => {
         document.getElementById('nav-about').addEventListener('click', (e) => { e.preventDefault(); closeSidebar(); showAbout(); });
 
         // Modals close
+        document.getElementById('btn-close-detail').addEventListener('click', () => toggleModal('modal-detail', false));
         document.getElementById('btn-close-event-modal').addEventListener('click', closeEventModal);
         document.getElementById('btn-close-event-list').addEventListener('click', () => toggleModal('modal-event-list', false));
         document.getElementById('btn-close-convert').addEventListener('click', () => toggleModal('modal-convert', false));
         document.getElementById('btn-close-upcoming').addEventListener('click', () => toggleModal('modal-upcoming', false));
         document.getElementById('btn-close-notification').addEventListener('click', () => toggleModal('modal-notification', false));
+        document.getElementById('btn-share-detail').addEventListener('click', shareDetail);
 
         // Event form
         document.getElementById('form-event').addEventListener('submit', handleEventSubmit);
@@ -199,14 +162,14 @@ const App = (() => {
         // Notification
         document.getElementById('btn-enable-notification').addEventListener('click', handleEnableNotification);
 
-        // Swipe gestures
+        // Swipe on calendar
         setupSwipeGestures();
 
         // Keyboard
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft') navigateMonth(-1);
             if (e.key === 'ArrowRight') navigateMonth(1);
-            if (e.key === 'Escape') { closeAllPickers(); closeAllModals(); }
+            if (e.key === 'Escape') closeAllModals();
         });
     }
 
@@ -227,7 +190,7 @@ const App = (() => {
         grid.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
         grid.addEventListener('touchend', (e) => {
             const diff = e.changedTouches[0].screenX - touchStartX;
-            if (Math.abs(diff) > 60) {
+            if (Math.abs(diff) > 80) {
                 navigateMonth(diff > 0 ? -1 : 1);
             }
         }, { passive: true });
@@ -239,23 +202,26 @@ const App = (() => {
     }
 
     function renderCalendar() {
-        // Header
-        document.getElementById('header-month').textContent = MONTHS[currentMonth];
-        document.getElementById('header-year').textContent = currentYear;
+        // Update month/year labels
+        document.getElementById('month-label').textContent = MONTHS_SHORT[currentMonth];
+        document.getElementById('year-label').textContent = currentYear;
+        document.getElementById('header-title').textContent = `Tháng ${currentMonth}, ${currentYear}`;
 
         const grid = document.getElementById('calendar-grid');
         grid.innerHTML = '';
 
-        // First day of month (0=Sun, 6=Sat)
-        const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
+        // Android app uses Monday as first day of week
+        // getDay(): 0=Sun, 1=Mon... We need Mon=0
+        const firstDayOfMonth = new Date(currentYear, currentMonth - 1, 1).getDay();
+        // Shift: Mon=0, Tue=1, ..., Sun=6
+        const startOffset = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
         const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
         const daysInPrevMonth = new Date(currentYear, currentMonth - 1, 0).getDate();
 
         const today = new Date();
-        const todayStr = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
 
-        // Previous month days
-        for (let i = firstDay - 1; i >= 0; i--) {
+        // Previous month fill
+        for (let i = startOffset - 1; i >= 0; i--) {
             const day = daysInPrevMonth - i;
             const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
             const prevYear = currentMonth === 1 ? currentYear - 1 : currentYear;
@@ -263,15 +229,15 @@ const App = (() => {
             grid.appendChild(cell);
         }
 
-        // Current month days
+        // Current month
         for (let day = 1; day <= daysInMonth; day++) {
             const cell = createCalendarCell(day, currentMonth, currentYear, false);
             grid.appendChild(cell);
         }
 
-        // Next month days (fill remaining cells to 42)
+        // Next month fill (to 42 cells)
         const totalCells = grid.children.length;
-        const remaining = 42 - totalCells;
+        const remaining = (totalCells <= 35 ? 35 : 42) - totalCells;
         for (let i = 1; i <= remaining; i++) {
             const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
             const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
@@ -286,9 +252,9 @@ const App = (() => {
         if (isOutside) cell.classList.add('outside');
 
         const lunar = VietCalendar.solarToLunar(day, month, year);
+        // getDay: 0=Sun
         const dayOfWeek = new Date(year, month - 1, day).getDay();
 
-        // Day of week styling
         if (dayOfWeek === 0) cell.classList.add('sunday');
         if (dayOfWeek === 6) cell.classList.add('saturday');
 
@@ -309,12 +275,11 @@ const App = (() => {
         solarEl.textContent = day;
         cell.appendChild(solarEl);
 
-        // Lunar day
+        // Lunar day (blue text like Android)
         const lunarEl = document.createElement('span');
         lunarEl.className = 'lunar-day';
         if (lunar.day === 1) {
             lunarEl.textContent = `${lunar.day}/${lunar.month}`;
-            lunarEl.style.color = '#e65100';
         } else {
             lunarEl.textContent = lunar.day;
         }
@@ -334,7 +299,6 @@ const App = (() => {
             cell.appendChild(dot);
         }
 
-        // Click handler
         cell.addEventListener('click', () => {
             selectedDate = { day, month, year };
             renderCalendar();
@@ -344,7 +308,7 @@ const App = (() => {
         return cell;
     }
 
-    // ============ DAY INFO ============
+    // ============ DAY INFO (Top section like Android) ============
     async function updateDayInfo() {
         if (!selectedDate) return;
         const { day, month, year } = selectedDate;
@@ -353,58 +317,111 @@ const App = (() => {
         const jdn = lunar.julianDay;
         const dayOfWeek = new Date(year, month - 1, day).getDay();
 
-        // Solar info
+        // Big day number
+        document.getElementById('info-big-day').textContent = day;
+
+        // Day of week
         document.getElementById('info-weekday').textContent = WEEKDAYS[dayOfWeek];
-        document.getElementById('info-solar-day').textContent = day;
-        document.getElementById('info-solar-month-year').textContent = `Tháng ${month}, ${year}`;
 
-        // Rating badge
-        const badge = document.getElementById('info-rating-badge');
-        const advice = info.dayAdvice;
-        badge.textContent = advice.ratingLabel;
-        badge.className = 'rating-badge';
-        const ratingClass = {
-            'VERY_GOOD': 'very-good', 'GOOD': 'good', 'NORMAL': 'normal',
-            'BAD': 'bad', 'VERY_BAD': 'very-bad'
-        };
-        badge.classList.add(ratingClass[advice.rating]);
-
-        // Lunar info
+        // Lunar left column
         const leapStr = lunar.isLeapMonth ? ' (nhuận)' : '';
-        document.getElementById('info-lunar-date').textContent =
-            `Ngày ${lunar.day} tháng ${info.tenThangAm}${leapStr} năm ${CanChi.canChiNam(lunar.year)}`;
+        document.getElementById('info-lunar-month').textContent = `Tháng ${info.tenThangAm}${leapStr}`;
+        document.getElementById('info-lunar-day').textContent = lunar.day;
+        document.getElementById('info-lunar-year').textContent = `Năm ${CanChi.canChiNam(lunar.year)}`;
 
-        document.getElementById('info-canchi-ngay').textContent = info.ngay;
-        document.getElementById('info-canchi-thang').textContent = info.thang;
-        document.getElementById('info-canchi-nam').textContent = info.nam;
-        document.getElementById('info-tiet-khi').textContent = info.tietKhi;
-        document.getElementById('info-gio-hoang-dao').textContent = info.gioHoangDao;
-        document.getElementById('info-truc').textContent = `${info.truc} - ${info.trucDetail}`;
-        document.getElementById('info-ngu-hanh').textContent = info.nguHanhNapAm;
-        document.getElementById('info-hoang-dao').textContent = info.hoangDao.label;
+        // Special day color (mùng 1, 15)
+        const lunarDayEl = document.getElementById('info-lunar-day');
+        if (lunar.day === 1 || lunar.day === 15) {
+            lunarDayEl.style.color = '#df2020';
+        } else {
+            lunarDayEl.style.color = '';
+        }
 
-        // Day advice
-        const nenLamEl = document.getElementById('info-nen-lam');
-        nenLamEl.innerHTML = advice.nenLam.map(t => `<span class="advice-tag">${t}</span>`).join('');
-        const khongNenEl = document.getElementById('info-khong-nen');
-        khongNenEl.innerHTML = advice.khongNen.map(t => `<span class="advice-tag">${t}</span>`).join('');
+        // Can Chi right column
+        document.getElementById('info-canchi-thang').textContent = `Tháng: ${info.thang}`;
+        document.getElementById('info-canchi-ngay').textContent = `Ngày: ${info.ngay}`;
+        document.getElementById('info-canchi-gio').textContent = `Giờ: ${info.gio}`;
+        document.getElementById('info-tiet-khi').textContent = `Tiết: ${info.tietKhi}`;
+
+        // Giờ Hoàng Đạo
+        document.getElementById('info-gio-hoang-dao').textContent = `Giờ Hoàng Đạo: ${info.gioHoangDao}`;
+
+        // Day rating badge
+        const advice = info.dayAdvice;
+        const ratingEl = document.getElementById('info-day-rating');
+        const ratingEmojis = { 'VERY_GOOD': '🌟', 'GOOD': '👍', 'NORMAL': '➖', 'BAD': '⚠️', 'VERY_BAD': '❌' };
+        const ratingClasses = { 'VERY_GOOD': 'very-good', 'GOOD': 'good', 'NORMAL': 'normal', 'BAD': 'bad', 'VERY_BAD': 'very-bad' };
+        ratingEl.textContent = `${ratingEmojis[advice.rating]} ${advice.ratingLabel} — Trực ${advice.truc}  ▸ Xem chi tiết`;
+        ratingEl.className = 'day-rating-badge ' + ratingClasses[advice.rating];
 
         // Events
         const { holidays, userEvents } = await EventsDB.getAllEventsForDay(day, month, lunar.day, lunar.month);
-        const eventsSection = document.getElementById('day-events');
-        const eventsList = document.getElementById('info-events-list');
-
-        if (holidays.length > 0 || userEvents.length > 0) {
-            eventsSection.style.display = 'block';
-            eventsList.innerHTML = '';
-            [...holidays, ...userEvents].forEach(evt => {
-                const item = document.createElement('div');
-                item.className = 'event-item';
-                item.textContent = evt.name || evt.title;
-                eventsList.appendChild(item);
-            });
+        const eventsEl = document.getElementById('info-events');
+        const allEvts = [...holidays.map(h => h.name), ...userEvents.map(e => `📌 ${e.title}`)];
+        if (allEvts.length > 0) {
+            eventsEl.textContent = allEvts.join('\n');
+            eventsEl.style.display = 'block';
+            eventsEl.style.whiteSpace = 'pre-line';
         } else {
-            eventsSection.style.display = 'none';
+            eventsEl.style.display = 'none';
+        }
+    }
+
+    // ============ DATE DETAIL (like Android's WebView detail) ============
+    function showDateDetail() {
+        if (!selectedDate) return;
+        const { day, month, year } = selectedDate;
+        const lunar = VietCalendar.solarToLunar(day, month, year);
+        const info = CanChi.getFullInfo(lunar);
+        const jdn = lunar.julianDay;
+        const advice = info.dayAdvice;
+        const dayOfWeek = new Date(year, month - 1, day).getDay();
+
+        let html = '';
+        html += `<h2>${WEEKDAYS[dayOfWeek]}, ${day}/${month}/${year}</h2>`;
+        html += `<div class="detail-hoang-dao" data-hd="${info.hoangDao.isHoangDao ? 1 : 0}">${info.hoangDao.label}</div>`;
+        html += `<p><b>Âm lịch:</b> Ngày ${lunar.day} tháng ${info.tenThangAm}${lunar.isLeapMonth ? ' (nhuận)' : ''} năm ${CanChi.canChiNam(lunar.year)}</p>`;
+        html += `<p><b>Can Chi ngày:</b> ${info.ngay}</p>`;
+        html += `<p><b>Can Chi tháng:</b> ${info.thang}</p>`;
+        html += `<p><b>Can Chi giờ:</b> ${info.gio}</p>`;
+        html += `<p><b>Giờ Hoàng Đạo:</b> ${info.gioHoangDao}</p>`;
+        html += `<p><b>Ngũ hành:</b> ${info.nguHanhNapAm}</p>`;
+        html += `<p><b>Tiết khí:</b> ${info.tietKhi}</p>`;
+        html += `<p><b>Trực:</b> ${info.truc} — ${info.trucDetail}</p>`;
+
+        // Advice
+        html += `<div class="advice-section"><h4>✅ Nên làm</h4><div class="advice-tags">`;
+        advice.nenLam.forEach(t => { html += `<span class="advice-tag good">${t}</span>`; });
+        html += `</div></div>`;
+        html += `<div class="advice-section"><h4>❌ Không nên</h4><div class="advice-tags">`;
+        advice.khongNen.forEach(t => { html += `<span class="advice-tag bad">${t}</span>`; });
+        html += `</div></div>`;
+
+        // Direction table
+        const canIndex = (jdn + 9) % 10;
+        const taiThan = CanChi.THIEN_CAN[canIndex] ? ['Đông Nam','Đông','Bắc','Bắc','ĐB','Tây','TN','TN','Nam','ĐN'][canIndex] : '';
+        const hyThan = ['ĐB','TB','TN','Nam','ĐN','ĐB','TB','TN','Nam','ĐN'][canIndex] || '';
+        const hacThan = ['TN','TB','ĐN','ĐB','Nam','TN','TB','ĐN','ĐB','Nam'][canIndex] || '';
+
+        html += `<p><b>Hướng xuất hành:</b></p>`;
+        html += `<table><thead><tr><th>Tài thần</th><th>Hỷ thần</th><th>Hạc thần</th></tr></thead>`;
+        html += `<tbody><tr><td>${taiThan}</td><td>${hyThan}</td><td>${hacThan}</td></tr></tbody></table>`;
+
+        document.getElementById('detail-body').innerHTML = html;
+        toggleModal('modal-detail', true);
+    }
+
+    function shareDetail() {
+        if (!selectedDate) return;
+        const { day, month, year } = selectedDate;
+        const lunar = VietCalendar.solarToLunar(day, month, year);
+        const info = CanChi.getFullInfo(lunar);
+        const text = `📅 ${day}/${month}/${year}\n🌙 Âm lịch: ${lunar.day}/${lunar.month}\n🔮 ${info.ngay}\n⏰ Giờ tốt: ${info.gioHoangDao}`;
+
+        if (navigator.share) {
+            navigator.share({ title: 'Âm Lịch Việt Nam', text });
+        } else {
+            navigator.clipboard.writeText(text).then(() => showToast('Đã copy!'));
         }
     }
 
@@ -413,7 +430,6 @@ const App = (() => {
         currentMonth += delta;
         if (currentMonth > 12) { currentMonth = 1; currentYear++; }
         if (currentMonth < 1) { currentMonth = 12; currentYear--; }
-        closeAllPickers();
         renderCalendar();
     }
 
@@ -422,109 +438,16 @@ const App = (() => {
         currentYear = today.getFullYear();
         currentMonth = today.getMonth() + 1;
         selectedDate = { day: today.getDate(), month: currentMonth, year: currentYear };
-        closeAllPickers();
         renderCalendar();
         updateDayInfo();
     }
 
-    // ============ MONTH PICKER ============
-    function toggleMonthPicker() {
-        const picker = document.getElementById('month-picker');
-        const yearPicker = document.getElementById('year-picker');
-        const headerMonth = document.getElementById('header-month');
-        const headerYear = document.getElementById('header-year');
-
-        // Close year picker if open
-        yearPicker.classList.add('hidden');
-        headerYear.classList.remove('active');
-
-        if (picker.classList.contains('hidden')) {
-            renderMonthPicker();
-            picker.classList.remove('hidden');
-            headerMonth.classList.add('active');
-        } else {
-            picker.classList.add('hidden');
-            headerMonth.classList.remove('active');
+    function showYearPicker() {
+        const year = prompt('Chọn năm (1900-2100):', currentYear);
+        if (year && parseInt(year) >= 1900 && parseInt(year) <= 2100) {
+            currentYear = parseInt(year);
+            renderCalendar();
         }
-    }
-
-    function renderMonthPicker() {
-        const grid = document.getElementById('month-picker-grid');
-        grid.innerHTML = '';
-        const todayMonth = new Date().getMonth() + 1;
-        const todayYear = new Date().getFullYear();
-
-        for (let m = 1; m <= 12; m++) {
-            const btn = document.createElement('button');
-            btn.className = 'picker-cell';
-            btn.textContent = `Tháng ${m}`;
-            if (m === currentMonth) btn.classList.add('current');
-            if (m === todayMonth && currentYear === todayYear) btn.classList.add('today-marker');
-            btn.addEventListener('click', () => {
-                currentMonth = m;
-                closeAllPickers();
-                renderCalendar();
-            });
-            grid.appendChild(btn);
-        }
-    }
-
-    // ============ YEAR PICKER ============
-    function toggleYearPicker() {
-        const picker = document.getElementById('year-picker');
-        const monthPicker = document.getElementById('month-picker');
-        const headerYear = document.getElementById('header-year');
-        const headerMonth = document.getElementById('header-month');
-
-        // Close month picker if open
-        monthPicker.classList.add('hidden');
-        headerMonth.classList.remove('active');
-
-        if (picker.classList.contains('hidden')) {
-            yearPickerBase = currentYear - (currentYear % 12);
-            renderYearPicker();
-            picker.classList.remove('hidden');
-            headerYear.classList.add('active');
-        } else {
-            picker.classList.add('hidden');
-            headerYear.classList.remove('active');
-        }
-    }
-
-    function renderYearPicker() {
-        const grid = document.getElementById('year-picker-grid');
-        grid.innerHTML = '';
-        const todayYear = new Date().getFullYear();
-        const rangeStart = yearPickerBase;
-        const rangeEnd = yearPickerBase + 11;
-
-        document.getElementById('year-picker-range').textContent = `${rangeStart} - ${rangeEnd}`;
-
-        for (let y = rangeStart; y <= rangeEnd; y++) {
-            const btn = document.createElement('button');
-            btn.className = 'picker-cell';
-            btn.textContent = y;
-            if (y === currentYear) btn.classList.add('current');
-            if (y === todayYear) btn.classList.add('today-marker');
-            btn.addEventListener('click', () => {
-                currentYear = y;
-                closeAllPickers();
-                renderCalendar();
-            });
-            grid.appendChild(btn);
-        }
-    }
-
-    function navigateYearPicker(delta) {
-        yearPickerBase += delta;
-        renderYearPicker();
-    }
-
-    function closeAllPickers() {
-        document.getElementById('month-picker').classList.add('hidden');
-        document.getElementById('year-picker').classList.add('hidden');
-        document.getElementById('header-month').classList.remove('active');
-        document.getElementById('header-year').classList.remove('active');
     }
 
     // ============ SIDEBAR ============
@@ -541,11 +464,8 @@ const App = (() => {
     // ============ MODALS ============
     function toggleModal(id, show) {
         const modal = document.getElementById(id);
-        if (show) {
-            modal.classList.remove('hidden');
-        } else {
-            modal.classList.add('hidden');
-        }
+        if (show) modal.classList.remove('hidden');
+        else modal.classList.add('hidden');
     }
 
     function closeAllModals() {
@@ -561,26 +481,22 @@ const App = (() => {
         document.getElementById('btn-delete-event').style.display = 'none';
         document.getElementById('event-remind-time').value = '07:00';
 
-        // Pre-fill with selected lunar date
         if (selectedDate) {
             const lunar = VietCalendar.solarToLunar(selectedDate.day, selectedDate.month, selectedDate.year);
             document.getElementById('event-lunar-day').value = lunar.day;
             document.getElementById('event-lunar-month').value = lunar.month;
         }
 
-        // Reset chips
         document.querySelectorAll('.chip-group .chip').forEach(c => c.classList.remove('active'));
         document.querySelector('#event-type-group [data-value="GIO"]').classList.add('active');
         document.querySelector('#event-repeat-group [data-value="YEARLY"]').classList.add('active');
         document.querySelector('#event-remind-group [data-value="0"]').classList.add('active');
-
         toggleModal('modal-event', true);
     }
 
     async function openEditEvent(id) {
         const evt = await EventsDB.getEvent(id);
         if (!evt) return;
-
         editingEventId = id;
         document.getElementById('modal-event-title').textContent = 'Sửa sự kiện';
         document.getElementById('event-title').value = evt.title || '';
@@ -592,17 +508,14 @@ const App = (() => {
             `${String(evt.remindHour || 7).padStart(2, '0')}:${String(evt.remindMinute || 0).padStart(2, '0')}`;
         document.getElementById('btn-delete-event').style.display = 'block';
 
-        // Set chips
         setChipValue('event-type-group', evt.eventType || 'KHAC');
         setChipValue('event-repeat-group', evt.repeat || 'YEARLY');
         setChipValue('event-remind-group', String(evt.remindDaysBefore || 0));
-
         toggleModal('modal-event', true);
     }
 
     function setChipValue(groupId, value) {
-        const group = document.getElementById(groupId);
-        group.querySelectorAll('.chip').forEach(c => {
+        document.getElementById(groupId).querySelectorAll('.chip').forEach(c => {
             c.classList.toggle('active', c.dataset.value === value);
         });
     }
@@ -689,16 +602,15 @@ const App = (() => {
                     toggleModal('modal-event-list', false);
                     openEditEvent(evt.id);
                 });
-                item.querySelector('.event-toggle').addEventListener('click', async (e) => {
-                    e.stopPropagation();
+                item.querySelector('.event-toggle').addEventListener('click', async (ev) => {
+                    ev.stopPropagation();
                     evt.isEnabled = !evt.isEnabled;
                     await EventsDB.updateEvent(evt);
-                    e.target.className = `event-toggle ${evt.isEnabled ? 'on' : 'off'}`;
+                    ev.target.className = `event-toggle ${evt.isEnabled ? 'on' : 'off'}`;
                 });
                 container.appendChild(item);
             });
         }
-
         toggleModal('modal-event-list', true);
     }
 
@@ -718,19 +630,12 @@ const App = (() => {
         const month = parseInt(document.getElementById('convert-solar-month').value);
         const year = parseInt(document.getElementById('convert-solar-year').value);
         const resultEl = document.getElementById('convert-result-lunar');
-
-        if (!day || !month || !year || year < 1900 || year > 2100) {
-            resultEl.textContent = '';
-            return;
-        }
-
+        if (!day || !month || !year || year < 1900 || year > 2100) { resultEl.textContent = ''; return; }
         try {
             const lunar = VietCalendar.solarToLunar(day, month, year);
             const leapStr = lunar.isLeapMonth ? ' (nhuận)' : '';
             resultEl.textContent = `Ngày ${lunar.day} tháng ${lunar.month}${leapStr} năm ${lunar.year} (${CanChi.canChiNam(lunar.year)})`;
-        } catch (e) {
-            resultEl.textContent = 'Ngày không hợp lệ';
-        }
+        } catch (e) { resultEl.textContent = 'Ngày không hợp lệ'; }
     }
 
     function handleLunarToSolar() {
@@ -738,19 +643,12 @@ const App = (() => {
         const month = parseInt(document.getElementById('convert-lunar-month').value);
         const year = parseInt(document.getElementById('convert-lunar-year').value);
         const resultEl = document.getElementById('convert-result-solar');
-
-        if (!day || !month || !year || year < 1900 || year > 2100) {
-            resultEl.textContent = '';
-            return;
-        }
-
+        if (!day || !month || !year || year < 1900 || year > 2100) { resultEl.textContent = ''; return; }
         try {
             const solar = VietCalendar.lunarToSolar(day, month, year, 0);
             const dow = new Date(solar.year, solar.month - 1, solar.day).getDay();
             resultEl.textContent = `${WEEKDAYS[dow]}, ${solar.day}/${solar.month}/${solar.year}`;
-        } catch (e) {
-            resultEl.textContent = 'Ngày không hợp lệ';
-        }
+        } catch (e) { resultEl.textContent = 'Ngày không hợp lệ'; }
     }
 
     // ============ UPCOMING EVENTS ============
@@ -781,7 +679,6 @@ const App = (() => {
                 container.appendChild(el);
             });
         }
-
         toggleModal('modal-upcoming', true);
     }
 
@@ -793,11 +690,11 @@ const App = (() => {
 
         if (permission === 'granted') {
             statusEl.className = 'notification-status granted';
-            statusEl.textContent = '✅ Thông báo đã được bật. Bạn sẽ nhận nhắc nhở về các sự kiện âm lịch.';
+            statusEl.textContent = '✅ Thông báo đã được bật.';
             btnEnable.style.display = 'none';
         } else if (permission === 'denied') {
             statusEl.className = 'notification-status denied';
-            statusEl.textContent = '❌ Thông báo đã bị chặn. Vui lòng vào cài đặt trình duyệt để bật lại.';
+            statusEl.textContent = '❌ Thông báo đã bị chặn. Vào cài đặt trình duyệt để bật lại.';
             btnEnable.style.display = 'none';
         } else if (permission === 'unsupported') {
             statusEl.className = 'notification-status denied';
@@ -805,16 +702,13 @@ const App = (() => {
             btnEnable.style.display = 'none';
         } else if (permission === 'ios-needs-homescreen') {
             statusEl.className = 'notification-status default';
-            statusEl.innerHTML = '⚠️ Trên iOS, thông báo chỉ hoạt động khi bạn đã <strong>thêm ứng dụng vào Màn hình chính</strong>.<br><br>' +
-                '📱 Nhấn nút <span style="display:inline-block;background:#007aff;color:white;padding:1px 6px;border-radius:3px;font-size:0.8em;">⎋</span> ' +
-                'ở thanh dưới → chọn <strong>"Thêm vào MH chính"</strong>';
+            statusEl.innerHTML = '⚠️ Trên iOS, cần <strong>thêm vào Màn hình chính</strong> trước khi bật thông báo.';
             btnEnable.style.display = 'none';
         } else {
             statusEl.className = 'notification-status default';
-            statusEl.textContent = '⚠️ Thông báo chưa được bật. Bật để nhận nhắc nhở sự kiện âm lịch.';
+            statusEl.textContent = '⚠️ Thông báo chưa được bật.';
             btnEnable.style.display = 'block';
         }
-
         toggleModal('modal-notification', true);
     }
 
@@ -822,7 +716,7 @@ const App = (() => {
         const result = await NotificationManager.requestPermission();
         if (result === 'granted') {
             showToast('Đã bật thông báo!');
-            openNotificationModal(); // Refresh status
+            openNotificationModal();
         } else {
             showToast('Không thể bật thông báo');
         }
@@ -830,7 +724,7 @@ const App = (() => {
 
     // ============ ABOUT ============
     function showAbout() {
-        alert('Âm Lịch Việt Nam v2.0 (PWA)\n\nỨng dụng xem ngày âm lịch, Can Chi, Giờ Hoàng Đạo, Tiết Khí.\n\nThuật toán: Hồ Ngọc Đức\nPhát triển: hotroso');
+        alert('Âm Lịch Việt Nam v2.0 (PWA)\n\nXem ngày âm lịch, Can Chi, Giờ Hoàng Đạo, Tiết Khí.\n\nThuật toán: Hồ Ngọc Đức\nPhát triển: hotroso');
     }
 
     // ============ TOAST ============
@@ -845,5 +739,4 @@ const App = (() => {
     return { init };
 })();
 
-// Boot
 document.addEventListener('DOMContentLoaded', App.init);
