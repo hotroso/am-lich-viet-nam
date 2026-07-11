@@ -160,6 +160,7 @@ const App = (() => {
         document.getElementById('btn-close-convert').addEventListener('click', () => toggleModal('modal-convert', false));
         document.getElementById('btn-close-upcoming').addEventListener('click', () => toggleModal('modal-upcoming', false));
         document.getElementById('btn-close-notification').addEventListener('click', () => toggleModal('modal-notification', false));
+        document.getElementById('btn-close-about').addEventListener('click', () => toggleModal('modal-about', false));
         document.getElementById('btn-share-detail').addEventListener('click', shareDetail);
 
         // Event form
@@ -846,7 +847,38 @@ const App = (() => {
 
     // ============ ABOUT ============
     function showAbout() {
-        alert('Âm Lịch Việt Nam v2.0 (PWA)\n\nXem ngày âm lịch, Can Chi, Giờ Hoàng Đạo, Tiết Khí.\n\nThuật toán: Hồ Ngọc Đức\nPhát triển: hotroso');
+        toggleModal('modal-about', true);
+        generateQRCode();
+    }
+
+    /**
+     * Generate QR Code on canvas (minimal implementation, no library)
+     * Uses a simple approach: draw QR via third-party image or manual encoding
+     */
+    function generateQRCode() {
+        const canvas = document.getElementById('qr-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const url = 'https://amlich.hotrogiaiphapso.info/';
+
+        // Use Google Charts API for QR (lightweight, no dependency)
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            ctx.clearRect(0, 0, 180, 180);
+            ctx.drawImage(img, 0, 0, 180, 180);
+        };
+        img.onerror = () => {
+            // Fallback: draw a placeholder
+            ctx.fillStyle = '#f0f0f0';
+            ctx.fillRect(0, 0, 180, 180);
+            ctx.fillStyle = '#333';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('QR Code', 90, 85);
+            ctx.fillText(url, 90, 105);
+        };
+        img.src = `https://chart.googleapis.com/chart?cht=qr&chs=180x180&chl=${encodeURIComponent(url)}&choe=UTF-8`;
     }
 
     // ============ TOAST ============

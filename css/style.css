@@ -924,6 +924,75 @@ body {
 
 .note { font-size: 0.8rem; color: var(--text-secondary); margin-top: 12px; }
 
+/* === About Modal === */
+.about-body {
+    text-align: center;
+    padding: 24px 16px;
+}
+
+.about-icon {
+    font-size: 3rem;
+    margin-bottom: 8px;
+}
+
+.about-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--title-color);
+    margin-bottom: 4px;
+}
+
+.about-version {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.about-desc {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.about-qr {
+    margin: 16px auto;
+    padding: 16px;
+    background: #f9f9f5;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+.about-qr canvas {
+    display: block;
+    margin: 0 auto 8px;
+    border-radius: 4px;
+}
+
+.about-qr-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin: 4px 0 2px;
+}
+
+.about-url {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.about-credits {
+    margin-top: 20px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+}
+
+.about-credits a {
+    color: var(--secondary);
+    text-decoration: none;
+}
+
 /* === Toast === */
 .toast {
     position: fixed;
