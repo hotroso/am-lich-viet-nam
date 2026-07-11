@@ -121,16 +121,23 @@ const NotificationManager = (() => {
         const currentMinute = now.getMinutes();
 
         for (const evt of events) {
-            // Get reminder days array (backward compatible)
-            const reminderDays = (evt.reminders && Array.isArray(evt.reminders))
-                ? evt.reminders
-                : [evt.remindDaysBefore || 0];
+            // Get reminder list (backward compatible)
+            let reminderItems = [];
+            if (evt.reminders && Array.isArray(evt.reminders)) {
+                if (evt.reminders.length > 0 && typeof evt.reminders[0] === 'object') {
+                    reminderItems = evt.reminders;
+                } else {
+                    reminderItems = evt.reminders.map(d => ({ days: d, note: '' }));
+                }
+            } else {
+                reminderItems = [{ days: evt.remindDaysBefore || 0, note: '' }];
+            }
 
-            for (const daysBefore of reminderDays) {
+            for (const reminder of reminderItems) {
+                const daysBefore = reminder.days;
                 let shouldNotify = false;
 
                 if (daysBefore > 0) {
-                    // Calculate the actual event date in solar
                     const eventSolar = VietCalendar.lunarToSolar(
                         evt.lunarDay, evt.lunarMonth,
                         evt.lunarYear || lunar.year, 0
@@ -145,7 +152,6 @@ const NotificationManager = (() => {
                         shouldNotify = true;
                     }
                 } else {
-                    // daysBefore === 0: notify on the event day itself
                     if (evt.repeat === 'MONTHLY' && lunar.day === evt.lunarDay) {
                         shouldNotify = true;
                     } else if (evt.repeat === 'YEARLY' && lunar.day === evt.lunarDay && lunar.month === evt.lunarMonth) {
@@ -164,14 +170,13 @@ const NotificationManager = (() => {
                     const isPastTime = (currentHour > remindHour) || (currentHour === remindHour && currentMinute > remindMinute + 5);
 
                     if (isExactTime || isPastTime) {
-                        // Unique key per event + daysBefore to allow multiple notifications
                         const notifiedKey = `notified_${evt.id}_${daysBefore}_${today.day}_${today.month}_${today.year}`;
                         if (!localStorage.getItem(notifiedKey)) {
                             const jdn = VietCalendar.jdFromDate(today.day, today.month, today.year);
                             const gioHoangDao = CanChi.getGioHoangDao(jdn);
 
                             const prefix = daysBefore > 0 ? `⏰ Còn ${daysBefore} ngày: ` : '📅 ';
-                            const body = buildNotificationBody(evt, lunar, gioHoangDao, daysBefore);
+                            const body = buildNotificationBody(evt, lunar, gioHoangDao, daysBefore, reminder.note);
                             await showNotification(
                                 `${prefix}${evt.title}`,
                                 body,
@@ -191,17 +196,20 @@ const NotificationManager = (() => {
     /**
      * Build notification body text.
      */
-    function buildNotificationBody(evt, lunar, gioHoangDao, daysBefore) {
+    function buildNotificationBody(evt, lunar, gioHoangDao, daysBefore, reminderNote) {
         const parts = [];
+        if (reminderNote) {
+            parts.push(`📝 ${reminderNote}`);
+        }
         if (daysBefore > 0) {
-            parts.push(`Sự kiện sẽ diễn ra sau ${daysBefore} ngày nữa`);
+            parts.push(`Sự kiện diễn ra sau ${daysBefore} ngày nữa`);
         }
         parts.push(`Ngày ${lunar.day} tháng ${lunar.month} âm lịch`);
-        if (gioHoangDao) {
+        if (daysBefore === 0 && gioHoangDao) {
             const firstGio = gioHoangDao.split(',')[0];
             parts.push(`Giờ tốt: ${firstGio}`);
         }
-        if (evt.note) {
+        if (!reminderNote && evt.note) {
             parts.push(evt.note);
         }
         return parts.join('\n');

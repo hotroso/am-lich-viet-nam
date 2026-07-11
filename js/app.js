@@ -600,48 +600,65 @@ const App = (() => {
     }
 
     // ============ EVENT MANAGEMENT ============
-    let currentReminders = []; // Array of days-before values
+    let currentReminders = []; // Array of { days: number, note: string }
 
     function renderRemindList() {
         const container = document.getElementById('remind-list');
         container.innerHTML = '';
-        currentReminders.sort((a, b) => b - a).forEach(days => {
-            const tag = document.createElement('span');
+        currentReminders.sort((a, b) => b.days - a.days).forEach((r, idx) => {
+            const tag = document.createElement('div');
             tag.className = 'remind-tag';
-            tag.innerHTML = `${days === 0 ? 'Đúng ngày' : days + ' ngày trước'}<button class="remove-remind" data-days="${days}">✕</button>`;
+            const daysLabel = r.days === 0 ? 'Đúng ngày' : `Trước ${r.days} ngày`;
+            const noteHtml = r.note ? ` — <span class="remind-tag-note">${r.note}</span>` : '';
+            tag.innerHTML = `<span class="remind-tag-info"><span class="remind-tag-days">${daysLabel}</span>${noteHtml}</span><button class="remove-remind" data-idx="${idx}">✕</button>`;
             tag.querySelector('.remove-remind').addEventListener('click', () => {
-                currentReminders = currentReminders.filter(d => d !== days);
+                currentReminders.splice(idx, 1);
                 renderRemindList();
             });
             container.appendChild(tag);
         });
     }
 
-    function addReminder(days) {
+    function addReminder(days, note) {
         days = parseInt(days);
         if (isNaN(days) || days < 0 || days > 90) return;
-        if (!currentReminders.includes(days)) {
-            currentReminders.push(days);
+        // Allow same days with different notes, but not exact duplicates
+        const exists = currentReminders.some(r => r.days === days && r.note === (note || ''));
+        if (!exists) {
+            currentReminders.push({ days, note: note || '' });
             renderRemindList();
         }
     }
 
     function setupRemindListeners() {
         document.getElementById('btn-add-remind').addEventListener('click', () => {
-            const input = document.getElementById('remind-custom-days');
-            addReminder(input.value);
-            input.value = '';
+            const daysInput = document.getElementById('remind-custom-days');
+            const noteInput = document.getElementById('remind-custom-note');
+            if (daysInput.value !== '') {
+                addReminder(daysInput.value, noteInput.value.trim());
+                daysInput.value = '';
+                noteInput.value = '';
+            }
         });
         document.getElementById('remind-custom-days').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                const input = document.getElementById('remind-custom-days');
-                addReminder(input.value);
-                input.value = '';
+                document.getElementById('btn-add-remind').click();
+            }
+        });
+        document.getElementById('remind-custom-note').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('btn-add-remind').click();
             }
         });
         document.querySelectorAll('.remind-preset').forEach(btn => {
-            btn.addEventListener('click', () => addReminder(btn.dataset.days));
+            btn.addEventListener('click', () => {
+                const days = parseInt(btn.dataset.days);
+                const noteInput = document.getElementById('remind-custom-note');
+                addReminder(days, noteInput.value.trim());
+                noteInput.value = '';
+            });
         });
     }
 
@@ -662,8 +679,7 @@ const App = (() => {
         document.querySelector('#event-type-group [data-value="GIO"]').classList.add('active');
         document.querySelector('#event-repeat-group [data-value="YEARLY"]').classList.add('active');
 
-        // Default: nhắc đúng ngày
-        currentReminders = [0];
+        currentReminders = [{ days: 0, note: '' }];
         renderRemindList();
 
         toggleModal('modal-event', true);
@@ -686,11 +702,16 @@ const App = (() => {
         setChipValue('event-type-group', evt.eventType || 'KHAC');
         setChipValue('event-repeat-group', evt.repeat || 'YEARLY');
 
-        // Load reminders (backward compatible: old single value → array)
+        // Load reminders (backward compatible)
         if (evt.reminders && Array.isArray(evt.reminders)) {
-            currentReminders = [...evt.reminders];
+            // Check if new format { days, note } or old format [number]
+            if (evt.reminders.length > 0 && typeof evt.reminders[0] === 'object') {
+                currentReminders = evt.reminders.map(r => ({ days: r.days, note: r.note || '' }));
+            } else {
+                currentReminders = evt.reminders.map(d => ({ days: d, note: '' }));
+            }
         } else {
-            currentReminders = [evt.remindDaysBefore || 0];
+            currentReminders = [{ days: evt.remindDaysBefore || 0, note: '' }];
         }
         renderRemindList();
 
@@ -722,8 +743,8 @@ const App = (() => {
             lunarYear: parseInt(document.getElementById('event-lunar-year').value) || 0,
             eventType: getChipValue('event-type-group') || 'KHAC',
             repeat: getChipValue('event-repeat-group') || 'YEARLY',
-            reminders: currentReminders.length > 0 ? [...currentReminders] : [0],
-            remindDaysBefore: currentReminders.length > 0 ? Math.min(...currentReminders) : 0, // backward compat
+            reminders: currentReminders.length > 0 ? [...currentReminders] : [{ days: 0, note: '' }],
+            remindDaysBefore: currentReminders.length > 0 ? Math.min(...currentReminders.map(r => r.days)) : 0, // backward compat
             remindHour: parseInt(time[0]) || 7,
             remindMinute: parseInt(time[1]) || 0,
             isEnabled: true

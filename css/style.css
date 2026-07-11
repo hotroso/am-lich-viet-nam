@@ -934,15 +934,31 @@ body {
 }
 
 .remind-tag {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
+    gap: 6px;
+    padding: 6px 10px;
     background: #e3f2fd;
     color: #1565c0;
-    border-radius: 14px;
+    border-radius: 8px;
     font-size: 0.8rem;
     font-weight: 500;
+    width: 100%;
+}
+
+.remind-tag .remind-tag-info {
+    flex: 1;
+}
+
+.remind-tag .remind-tag-days {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.remind-tag .remind-tag-note {
+    font-weight: 400;
+    color: #333;
+    font-size: 0.75rem;
 }
 
 .remind-tag .remove-remind {
@@ -961,26 +977,33 @@ body {
 
 .remind-add-row {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     margin-bottom: 8px;
 }
 
 .remind-input {
-    flex: 1;
-    padding: 8px 12px;
+    width: 70px;
+    padding: 8px 10px;
     border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 0.85rem;
-    max-width: 120px;
+}
+
+.remind-note-input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.85rem;
 }
 
 .btn-add-remind {
-    padding: 8px 14px;
+    padding: 8px 12px;
     background: var(--secondary);
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
 }
