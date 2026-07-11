@@ -42,14 +42,11 @@
             android:contentDescription="Sau"/>
     </LinearLayout>
 
-    <!-- Grid 4x3 for 12 years -->
-    <GridLayout
+    <!-- Container for year buttons (built by code as 3 rows x 4 cols) -->
+    <LinearLayout
         android:id="@+id/gridYears"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:columnCount="4"
-        android:rowCount="3"
-        android:alignmentMode="alignMargins"
-        android:useDefaultMargins="true"/>
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

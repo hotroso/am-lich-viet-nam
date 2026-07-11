@@ -14,14 +14,11 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"/>
 
-    <!-- Grid 3x4 for 12 months -->
-    <GridLayout
+    <!-- Container for month buttons (built by code as 4 rows x 3 cols) -->
+    <LinearLayout
         android:id="@+id/gridMonths"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:columnCount="3"
-        android:rowCount="4"
-        android:alignmentMode="alignMargins"
-        android:useDefaultMargins="true"/>
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

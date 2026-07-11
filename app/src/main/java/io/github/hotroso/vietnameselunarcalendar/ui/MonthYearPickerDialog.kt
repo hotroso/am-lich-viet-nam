@@ -6,102 +6,111 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.Gravity
-import android.view.View
-import android.widget.GridLayout
+import android.view.Window
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import io.github.hotroso.vietnameselunarcalendar.R
 import java.util.Calendar
 
 /**
- * Dialog chọn tháng dạng grid 3x4 (giống web version).
+ * Dialog chọn tháng dạng grid 3 cột x 4 hàng.
  */
 class MonthPickerDialog(
     context: Context,
-    private val currentMonth: Int, // 0-based (0=Jan)
+    private val currentMonth: Int, // 0-based
     private val currentYear: Int,
     private val onMonthSelected: (month: Int) -> Unit
 ) : Dialog(context) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.dialog_month_picker)
 
-        val grid = findViewById<GridLayout>(R.id.gridMonths)
+        val container = findViewById<LinearLayout>(R.id.gridMonths)
         val todayMonth = Calendar.getInstance().get(Calendar.MONTH)
         val todayYear = Calendar.getInstance().get(Calendar.YEAR)
 
-        for (m in 0 until 12) {
-            val btn = createPickerButton("Tháng ${m + 1}")
+        // Build 4 rows x 3 columns
+        for (row in 0 until 4) {
+            val rowLayout = LinearLayout(context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+            }
 
-            // Highlight current month
-            if (m == currentMonth) {
-                val bg = GradientDrawable().apply {
-                    shape = GradientDrawable.RECTANGLE
-                    cornerRadius = dpToPx(8f)
-                    setColor(Color.parseColor("#b22b23"))
+            for (col in 0 until 3) {
+                val m = row * 3 + col
+                val btn = createCell("Tháng ${m + 1}")
+
+                when {
+                    m == currentMonth -> applySelectedStyle(btn)
+                    m == todayMonth && currentYear == todayYear -> applyTodayStyle(btn)
                 }
-                btn.background = bg
-                btn.setTextColor(Color.WHITE)
-                btn.typeface = Typeface.DEFAULT_BOLD
-            }
 
-            // Mark today's month
-            if (m == todayMonth && currentYear == todayYear && m != currentMonth) {
-                val bg = GradientDrawable().apply {
-                    shape = GradientDrawable.RECTANGLE
-                    cornerRadius = dpToPx(8f)
-                    setStroke(dpToPx(2f).toInt(), Color.parseColor("#d4a56f"))
+                btn.setOnClickListener {
+                    onMonthSelected(m)
+                    dismiss()
                 }
-                btn.background = bg
+
+                val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                    setMargins(dp(4), dp(4), dp(4), dp(4))
+                }
+                rowLayout.addView(btn, params)
             }
 
-            btn.setOnClickListener {
-                onMonthSelected(m)
-                dismiss()
-            }
-
-            val params = GridLayout.LayoutParams().apply {
-                width = 0
-                height = GridLayout.LayoutParams.WRAP_CONTENT
-                columnSpec = GridLayout.spec(m % 3, 1f)
-                rowSpec = GridLayout.spec(m / 3)
-                setMargins(dpToPx(3f).toInt(), dpToPx(3f).toInt(), dpToPx(3f).toInt(), dpToPx(3f).toInt())
-            }
-            grid.addView(btn, params)
+            container.addView(rowLayout)
         }
     }
 
-    private fun createPickerButton(text: String): TextView {
+    private fun createCell(text: String): TextView {
         return TextView(context).apply {
             this.text = text
             textSize = 14f
             gravity = Gravity.CENTER
-            setPadding(dpToPx(8f).toInt(), dpToPx(12f).toInt(), dpToPx(8f).toInt(), dpToPx(12f).toInt())
+            setPadding(dp(4), dp(14), dp(4), dp(14))
             setTextColor(Color.parseColor("#212121"))
-
             val bg = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
-                cornerRadius = dpToPx(8f)
-                setColor(Color.TRANSPARENT)
+                cornerRadius = dp(8).toFloat()
+                setColor(Color.parseColor("#f5f5f5"))
             }
             background = bg
-
-            val outValue = TypedValue()
-            context.theme.resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
-            foreground = context.getDrawable(outValue.resourceId)
         }
     }
 
-    private fun dpToPx(dp: Float): Float {
-        return dp * context.resources.displayMetrics.density
+    private fun applySelectedStyle(tv: TextView) {
+        val bg = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dp(8).toFloat()
+            setColor(Color.parseColor("#b22b23"))
+        }
+        tv.background = bg
+        tv.setTextColor(Color.WHITE)
+        tv.typeface = Typeface.DEFAULT_BOLD
+    }
+
+    private fun applyTodayStyle(tv: TextView) {
+        val bg = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dp(8).toFloat()
+            setColor(Color.parseColor("#f5f5f5"))
+            setStroke(dp(2), Color.parseColor("#d4a56f"))
+        }
+        tv.background = bg
+    }
+
+    private fun dp(value: Int): Int {
+        return (value * context.resources.displayMetrics.density).toInt()
     }
 }
 
 /**
- * Dialog chọn năm dạng grid 4x3 với navigation [<] range [>] (giống web version).
+ * Dialog chọn năm dạng grid 4 cột x 3 hàng + navigation [<][>].
  */
 class YearPickerDialog(
     context: Context,
@@ -110,14 +119,15 @@ class YearPickerDialog(
 ) : Dialog(context) {
 
     private var baseYear: Int = 0
-    private lateinit var grid: GridLayout
+    private lateinit var container: LinearLayout
     private lateinit var tvRange: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.dialog_year_picker)
 
-        grid = findViewById(R.id.gridYears)
+        container = findViewById(R.id.gridYears)
         tvRange = findViewById(R.id.tvYearRange)
 
         baseYear = currentYear - (currentYear % 12)
@@ -134,74 +144,84 @@ class YearPickerDialog(
     }
 
     private fun renderGrid() {
-        grid.removeAllViews()
-        val rangeEnd = baseYear + 11
-        tvRange.text = "$baseYear - $rangeEnd"
+        container.removeAllViews()
+        tvRange.text = "$baseYear - ${baseYear + 11}"
 
         val todayYear = Calendar.getInstance().get(Calendar.YEAR)
 
-        for (i in 0 until 12) {
-            val year = baseYear + i
-            val btn = createPickerButton(year.toString())
+        // Build 3 rows x 4 columns
+        for (row in 0 until 3) {
+            val rowLayout = LinearLayout(context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+            }
 
-            if (year == currentYear) {
-                val bg = GradientDrawable().apply {
-                    shape = GradientDrawable.RECTANGLE
-                    cornerRadius = dpToPx(8f)
-                    setColor(Color.parseColor("#b22b23"))
+            for (col in 0 until 4) {
+                val index = row * 4 + col
+                val year = baseYear + index
+                val btn = createCell(year.toString())
+
+                when {
+                    year == currentYear -> applySelectedStyle(btn)
+                    year == todayYear -> applyTodayStyle(btn)
                 }
-                btn.background = bg
-                btn.setTextColor(Color.WHITE)
-                btn.typeface = Typeface.DEFAULT_BOLD
-            }
 
-            if (year == todayYear && year != currentYear) {
-                val bg = GradientDrawable().apply {
-                    shape = GradientDrawable.RECTANGLE
-                    cornerRadius = dpToPx(8f)
-                    setStroke(dpToPx(2f).toInt(), Color.parseColor("#d4a56f"))
+                btn.setOnClickListener {
+                    onYearSelected(year)
+                    dismiss()
                 }
-                btn.background = bg
+
+                val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                    setMargins(dp(4), dp(4), dp(4), dp(4))
+                }
+                rowLayout.addView(btn, params)
             }
 
-            btn.setOnClickListener {
-                onYearSelected(year)
-                dismiss()
-            }
-
-            val params = GridLayout.LayoutParams().apply {
-                width = 0
-                height = GridLayout.LayoutParams.WRAP_CONTENT
-                columnSpec = GridLayout.spec(i % 4, 1f)
-                rowSpec = GridLayout.spec(i / 4)
-                setMargins(dpToPx(3f).toInt(), dpToPx(3f).toInt(), dpToPx(3f).toInt(), dpToPx(3f).toInt())
-            }
-            grid.addView(btn, params)
+            container.addView(rowLayout)
         }
     }
 
-    private fun createPickerButton(text: String): TextView {
+    private fun createCell(text: String): TextView {
         return TextView(context).apply {
             this.text = text
             textSize = 14f
             gravity = Gravity.CENTER
-            setPadding(dpToPx(8f).toInt(), dpToPx(12f).toInt(), dpToPx(8f).toInt(), dpToPx(12f).toInt())
+            setPadding(dp(4), dp(14), dp(4), dp(14))
             setTextColor(Color.parseColor("#212121"))
-
             val bg = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
-                cornerRadius = dpToPx(8f)
-                setColor(Color.TRANSPARENT)
+                cornerRadius = dp(8).toFloat()
+                setColor(Color.parseColor("#f5f5f5"))
             }
             background = bg
-
-            val outValue = TypedValue()
-            context.theme.resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
-            foreground = context.getDrawable(outValue.resourceId)
         }
     }
 
-    private fun dpToPx(dp: Float): Float {
-        return dp * context.resources.displayMetrics.density
+    private fun applySelectedStyle(tv: TextView) {
+        val bg = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dp(8).toFloat()
+            setColor(Color.parseColor("#b22b23"))
+        }
+        tv.background = bg
+        tv.setTextColor(Color.WHITE)
+        tv.typeface = Typeface.DEFAULT_BOLD
+    }
+
+    private fun applyTodayStyle(tv: TextView) {
+        val bg = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dp(8).toFloat()
+            setColor(Color.parseColor("#f5f5f5"))
+            setStroke(dp(2), Color.parseColor("#d4a56f"))
+        }
+        tv.background = bg
+    }
+
+    private fun dp(value: Int): Int {
+        return (value * context.resources.displayMetrics.density).toInt()
     }
 }
