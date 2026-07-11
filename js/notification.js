@@ -4,7 +4,7 @@
  */
 
 const NotificationManager = (() => {
-    const CHECK_INTERVAL = 5 * 60 * 1000; // Check every 5 minutes
+    const CHECK_INTERVAL = 60 * 60 * 1000; // Check every hour
     let checkTimer = null;
 
     /**
